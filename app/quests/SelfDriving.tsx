@@ -39,15 +39,15 @@ export default function SelfDriving({ onComplete }: { onComplete: () => void }) 
   // Car drives forward between events
   useEffect(() => {
     if (phase !== "driving") return;
-    const t = setInterval(() => setCarPos((p) => Math.min(p + 1, 70)), 6000);
-    const show = setTimeout(() => { setPhase("event"); setTimer(0); }, 150000);
+    const t = setInterval(() => setCarPos((p) => Math.min(p + 1, 70)), 3000);
+    const show = setTimeout(() => { setPhase("event"); setTimer(0); }, 75000);
     return () => { clearInterval(t); clearTimeout(show); };
   }, [phase]);
 
   // Timer ticks during event phase
   useEffect(() => {
     if (phase !== "event") return;
-    const t = setInterval(() => setTimer((v) => v + 100), 10000);
+    const t = setInterval(() => setTimer((v) => v + 100), 5000);
     return () => clearInterval(t);
   }, [phase]);
 
@@ -131,7 +131,7 @@ export default function SelfDriving({ onComplete }: { onComplete: () => void }) 
       {/* Road */}
       <div className="w-full max-w-lg h-28 bg-gray-800 rounded-2xl relative overflow-hidden">
         <div className="absolute bottom-0 w-full h-1 bg-gray-600" />
-        <div className="text-5xl absolute bottom-3 transition-all car" style={{ left: `${carPos}%`, transitionDuration: "15s" }}>🛻</div>
+        <div className="text-5xl absolute bottom-3 transition-all car" style={{ left: `${carPos}%`, transitionDuration: "7.5s" }}>🛻</div>
         {phase !== "driving" && <div className="text-5xl absolute top-3 right-8">{event.emoji}</div>}
         {/* AI thinking indicator */}
         {phase === "event" && !aiActed && !overridden && (
