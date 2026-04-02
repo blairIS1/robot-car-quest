@@ -48,13 +48,7 @@ export default function Home() {
   const startQuest = (questPhase: Phase) => {
     sfxTap();
     stopSpeaking();
-    if (!welcomed) {
-      setWelcomed(true);
-      startMusic();
-      speak(VOICE.welcome).then(() => setPhase(questPhase));
-    } else {
-      setPhase(questPhase);
-    }
+    setPhase(questPhase);
   };
 
   if (expired) {
@@ -74,6 +68,8 @@ export default function Home() {
         <button className="btn btn-primary text-xl mt-4" onClick={() => {
           sfxTap();
           setStarted(true);
+          setWelcomed(true);
+          startMusic();
           speak(VOICE.welcome).then(() => speak(VOICE.menuSubtitle));
         }}>
           ▶️ Start!
