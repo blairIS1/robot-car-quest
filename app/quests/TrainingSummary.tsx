@@ -19,7 +19,7 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
   const isBiased = total > 0 && maxCount / total > 0.5;
 
   useEffect(() => {
-    speak(VOICE.summary).then(() => { if (isBiased) speak(VOICE.summaryBias); });
+    speak(VOICE.q3Done).then(() => speak(VOICE.summary)).then(() => { if (isBiased) speak(VOICE.summaryBias); });
     return () => stopSpeaking();
   }, [isBiased]);
 

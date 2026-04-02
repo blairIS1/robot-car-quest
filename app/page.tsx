@@ -150,7 +150,7 @@ export default function Home() {
         if (needsRetrain) setPhase("q3");
         else { markDone(3); setPhase("q5"); }
       }} />}
-      {phase === "q5" && <SelfDriving training={training} onComplete={() => { markDone(4); setCompletions(recordCompletion()); sfxCelebrate(); setPhase("menu"); }} />}
+      {phase === "q5" && <SelfDriving training={training} onComplete={() => { markDone(4); setCompletions(recordCompletion()); sfxCelebrate(); setPhase("menu"); speak(VOICE.q5Done).then(() => speak(VOICE.allDone)); }} />}
     </>
   );
 }

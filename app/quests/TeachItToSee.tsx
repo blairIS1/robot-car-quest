@@ -19,7 +19,7 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    speak(VOICE.q3Start);
+    speak(VOICE.q2Done).then(() => speak(VOICE.q3Start));
     return () => stopSpeaking();
   }, []);
 
@@ -52,7 +52,7 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
         <CarBuddy mood="celebrate" size={mobile ? 80 : 120} />
         <h2 className="text-3xl font-bold">👁️ Training Complete!</h2>
         <p className="text-xl">You labeled <b>{total}/{items.length}</b> correctly!</p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); stopSpeaking(); speak(VOICE.q3Done).then(() => onComplete(training)); }}>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); stopSpeaking(); onComplete(training); }}>
           See Training Results →
         </button>
       </div>

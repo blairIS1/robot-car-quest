@@ -95,7 +95,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
           Even smart AI makes mistakes! That&apos;s why self-driving cars still need
           a human paying attention. You were the safety driver!
         </ReadableText>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); sfxCelebrate(); stopSpeaking(); speak(VOICE.q5Done).then(onComplete); }}>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); sfxCelebrate(); stopSpeaking(); onComplete(); }}>
           🏠 Back to Menu
         </button>
       </div>

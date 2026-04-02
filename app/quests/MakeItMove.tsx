@@ -84,7 +84,7 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
         <span>{learned.regen ? "✅" : "⬜"} Regen brake</span>
       </div>
 
-      {done && <button className="btn btn-success mt-2 fade-in" onClick={() => { sfxTap(); stopSpeaking(); speak(VOICE.q2Done).then(onComplete); }}>Next Quest →</button>}
+      {done && <button className="btn btn-success mt-2 fade-in" onClick={() => { sfxTap(); stopSpeaking(); onComplete(); }}>Next Quest →</button>}
     </div>
   );
 }
