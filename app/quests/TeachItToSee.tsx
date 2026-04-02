@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TRAIN_ITEMS, TrainingData } from "./data";
 import CarBuddy from "./CarBuddy";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
+import { speak, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function TeachItToSee({ onComplete }: { onComplete: (data: TrainingData) => void }) {
@@ -14,6 +15,8 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
   const [showConfetti, setShowConfetti] = useState(false);
   const [done, setDone] = useState(false);
 
+  useEffect(() => { speak(VOICE.q3Start); }, []);
+
   const current = items[idx];
 
   const answer = (choice: "stop" | "go") => {
@@ -22,9 +25,11 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
       setTraining((t) => ({ ...t, [current.category]: (t[current.category] || 0) + 1 }));
       setFeedback("✅ Correct! The car learned about " + current.label + "!");
+      speak(VOICE.q3Correct);
     } else {
       sfxWrong(); setMood("scared");
       setFeedback(`❌ Oops! The car should ${current.answer} for "${current.label}"`);
+      speak(VOICE.q3Wrong);
     }
     setTimeout(() => {
       setFeedback(""); setMood("idle"); setShowConfetti(false);
@@ -41,7 +46,7 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
         <CarBuddy mood="celebrate" size={120} />
         <h2 className="text-3xl font-bold">👁️ Training Complete!</h2>
         <p className="text-xl">You labeled <b>{total}/{items.length}</b> correctly!</p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); onComplete(training); }}>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak(VOICE.q3Done).then(() => onComplete(training)); }}>
           See Training Results →
         </button>
       </div>

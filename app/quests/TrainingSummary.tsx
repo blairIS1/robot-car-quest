@@ -1,7 +1,9 @@
 "use client";
+import { useEffect } from "react";
 import { CATEGORIES, TrainingData, getConfidence } from "./data";
 import CarBuddy from "./CarBuddy";
 import { sfxTap } from "./sfx";
+import { speak, VOICE } from "./speak";
 
 const CAT_EMOJI: Record<string, string> = { lights: "🚦", signs: "🛑", people: "🚶", animals: "🐕", obstacles: "🚧" };
 
@@ -13,6 +15,12 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
   const maxCat = CATEGORIES.reduce((a, b) => ((training[a] || 0) > (training[b] || 0) ? a : b));
   const maxCount = training[maxCat] || 0;
   const isBiased = total > 0 && maxCount / total > 0.5;
+
+  useEffect(() => {
+    speak(VOICE.summary).then(() => {
+      if (isBiased) speak(VOICE.summaryBias);
+    });
+  }, [isBiased]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">

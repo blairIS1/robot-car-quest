@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CarBuddy from "./CarBuddy";
 import { sfxTap, sfxCorrect, sfxWrong } from "./sfx";
+import { speak, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function PowerUp({ onComplete }: { onComplete: () => void }) {
@@ -9,6 +10,8 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
   const ideal = 4;
   const max = 7;
   const status = batteries === 0 ? "empty" : batteries < ideal ? "low" : batteries === ideal ? "perfect" : batteries <= max ? "heavy" : "overload";
+
+  useEffect(() => { speak(VOICE.q1Start); }, []);
 
   const msg: Record<string, string> = {
     empty: "Tap the batteries to add them to your car! 🔋",
@@ -49,8 +52,8 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
           sfxTap();
           const n = Math.min(batteries + 1, max + 1);
           setBatteries(n);
-          if (n === ideal) sfxCorrect();
-          else if (n > max) sfxWrong();
+          if (n === ideal) { sfxCorrect(); speak(VOICE.q1Perfect); }
+          else if (n > max) { sfxWrong(); speak(VOICE.q1TooMany); }
         }}>🔋 +1</button>
         <button className="btn text-3xl" style={{ background: "#475569" }} onClick={() => { sfxTap(); setBatteries(Math.max(batteries - 1, 0)); }}>➖</button>
       </div>

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import CarBuddy from "./CarBuddy";
 import { sfxEngine, sfxBrake, sfxTap, sfxCelebrate } from "./sfx";
+import { speak, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
@@ -9,6 +10,8 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
   const [battery, setBattery] = useState(80);
   const [braking, setBraking] = useState(false);
   const [learned, setLearned] = useState({ drove: false, regen: false });
+
+  useEffect(() => { speak(VOICE.q2Start); }, []);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -22,11 +25,11 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
   }, [speed, braking]);
 
   useEffect(() => {
-    if (speed >= 3 && !learned.drove) { setLearned((l) => ({ ...l, drove: true })); sfxEngine(); }
+    if (speed >= 3 && !learned.drove) { setLearned((l) => ({ ...l, drove: true })); sfxEngine(); speak(VOICE.q2Fast); }
   }, [speed, learned.drove]);
 
   useEffect(() => {
-    if (braking && battery > 82 && !learned.regen) { setLearned((l) => ({ ...l, regen: true })); sfxCelebrate(); }
+    if (braking && battery > 82 && !learned.regen) { setLearned((l) => ({ ...l, regen: true })); sfxCelebrate(); speak(VOICE.q2Regen); }
   }, [braking, battery, learned.regen]);
 
   const done = learned.drove && learned.regen;
@@ -75,7 +78,7 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
         <span>{learned.regen ? "✅" : "⬜"} Regen brake</span>
       </div>
 
-      {done && <button className="btn btn-success mt-2 fade-in" onClick={() => { sfxTap(); onComplete(); }}>Next Quest →</button>}
+      {done && <button className="btn btn-success mt-2 fade-in" onClick={() => { sfxTap(); speak(VOICE.q2Done).then(onComplete); }}>Next Quest →</button>}
     </div>
   );
 }

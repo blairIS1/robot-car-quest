@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { TrainingData, generateTestScenes } from "./data";
 import CarBuddy from "./CarBuddy";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
+import { speak, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function TestDrive({ training, onComplete }: { training: TrainingData; onComplete: (needsRetrain: boolean) => void }) {
@@ -14,6 +15,8 @@ export default function TestDrive({ training, onComplete }: { training: Training
   const [showConfetti, setShowConfetti] = useState(false);
   const [done, setDone] = useState(false);
   const [carPos, setCarPos] = useState(10);
+
+  useEffect(() => { speak(VOICE.q4Start); }, []);
 
   const scene = scenes[idx];
 
@@ -27,8 +30,8 @@ export default function TestDrive({ training, onComplete }: { training: Training
 
   const choose = (c: string) => {
     setPicked(c);
-    if (c === scene.correct) { sfxCorrect(); setMood("happy"); setShowConfetti(true); }
-    else { sfxWrong(); setMood("scared"); setMistakes((m) => m + 1); }
+    if (c === scene.correct) { sfxCorrect(); setMood("happy"); setShowConfetti(true); speak(VOICE.q4Correct); }
+    else { sfxWrong(); setMood("scared"); setMistakes((m) => m + 1); speak(VOICE.q4Wrong); }
     setTimeout(() => {
       setPicked(null); setMood("thinking"); setShowConfetti(false);
       if (idx + 1 < scenes.length) setIdx(idx + 1);

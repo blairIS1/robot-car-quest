@@ -9,6 +9,7 @@ import SelfDriving from "./quests/SelfDriving";
 import CarBuddy from "./quests/CarBuddy";
 import Confetti from "./quests/Confetti";
 import { sfxTap, sfxCelebrate } from "./quests/sfx";
+import { speak, VOICE } from "./quests/speak";
 import { recordCompletion, getCompletions } from "./quests/scores";
 import { TrainingData } from "./quests/data";
 
@@ -22,7 +23,7 @@ export default function Home() {
   const [training, setTraining] = useState<TrainingData>({});
   const [completions, setCompletions] = useState(0);
 
-  useEffect(() => { setCompletions(getCompletions()); }, []);
+  useEffect(() => { setCompletions(getCompletions()); speak(VOICE.welcome); }, []);
 
   const markDone = (idx: number) => {
     setCompleted((prev) => { const n = [...prev]; n[idx] = true; return n; });

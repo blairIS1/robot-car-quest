@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { TrainingData, generateSelfDrivingEvents } from "./data";
 import CarBuddy from "./CarBuddy";
 import { sfxCorrect, sfxWrong, sfxTap, sfxBrake, sfxCelebrate } from "./sfx";
+import { speak, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function SelfDriving({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
@@ -16,6 +17,8 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
   const [crashes, setCrashes] = useState(0);
   const [done, setDone] = useState(false);
   const [timer, setTimer] = useState(0);
+
+  useEffect(() => { speak(VOICE.q5Start); }, []);
 
   const event = events[idx];
   const aiWrong = event.correct !== event.aiChoice;
@@ -40,8 +43,8 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
 
   useEffect(() => {
     if (!aiActed || phase !== "event") return;
-    if (aiWrong) { setCrashes((c) => c + 1); sfxWrong(); }
-    else sfxCorrect();
+    if (aiWrong) { setCrashes((c) => c + 1); sfxWrong(); speak(VOICE.q5Crash); }
+    else { sfxCorrect(); speak(VOICE.q5AiRight); }
     setPhase("result");
   }, [aiActed, phase, aiWrong]);
 
@@ -49,7 +52,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
     if (phase !== "event" || aiActed) return;
     setOverridden(true);
     setPhase("result");
-    if (aiWrong) { setSaves((s) => s + 1); sfxBrake(); sfxCorrect(); }
+    if (aiWrong) { setSaves((s) => s + 1); sfxBrake(); sfxCorrect(); speak(VOICE.q5Save); }
   }, [phase, aiActed, aiWrong]);
 
   const getResult = () => {
@@ -86,7 +89,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
           Even smart AI makes mistakes! That&apos;s why self-driving cars still need
           a human paying attention. You were the safety driver!
         </p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); sfxCelebrate(); onComplete(); }}>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); sfxCelebrate(); speak(VOICE.q5Done).then(onComplete); }}>
           🏠 Back to Menu
         </button>
       </div>
