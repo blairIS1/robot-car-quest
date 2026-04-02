@@ -21,7 +21,7 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
       <h2 className="text-3xl font-bold">⚡ Quest 1: Power Up!</h2>
       <p className="opacity-70 text-center max-w-md">
-        A Tesla has a big battery under the floor. Too few batteries = car stops halfway.
+        Electric cars have a big battery under the floor. Too few batteries = car stops halfway.
         Too many = car is too heavy! Find the right number.
       </p>
 

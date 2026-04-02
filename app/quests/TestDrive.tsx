@@ -1,64 +1,75 @@
 "use client";
 import { useState, useEffect } from "react";
+import { TrainingData, generateTestScenes } from "./data";
 
-const SCENES = [
-  { emoji: "🟢", label: "Green light ahead", correct: "go", carAction: "Car sees green — vroom!" },
-  { emoji: "🛑", label: "Stop sign!", correct: "stop", carAction: "Car sees the stop sign and brakes!" },
-  { emoji: "🚶", label: "Person crossing the road", correct: "stop", carAction: "Car waits for the person to cross safely." },
-  { emoji: "➡️", label: "Open road ahead", correct: "go", carAction: "All clear — car drives on!" },
-  { emoji: "🔴", label: "Red light!", correct: "stop", carAction: "Car stops at the red light." },
-];
-
-export default function TestDrive({ onComplete }: { onComplete: () => void }) {
+export default function TestDrive({ training, onComplete }: { training: TrainingData; onComplete: (needsRetrain: boolean) => void }) {
+  const [scenes] = useState(() => generateTestScenes(training));
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
+  const [mistakes, setMistakes] = useState(0);
   const [done, setDone] = useState(false);
   const [carPos, setCarPos] = useState(10);
 
+  const scene = scenes[idx];
+
   useEffect(() => {
-    if (picked === SCENES[idx]?.correct) {
+    if (picked === scene?.correct) {
       const t = setInterval(() => setCarPos((p) => Math.min(p + 2, 90)), 50);
       const stop = setTimeout(() => { clearInterval(t); setCarPos(10); }, 1200);
       return () => { clearInterval(t); clearTimeout(stop); };
     }
-  }, [picked, idx]);
-
-  const scene = SCENES[idx];
+  }, [picked, scene]);
 
   const choose = (c: string) => {
     setPicked(c);
+    if (c !== scene.correct) setMistakes((m) => m + 1);
     setTimeout(() => {
       setPicked(null);
-      if (idx + 1 < SCENES.length) setIdx(idx + 1);
+      if (idx + 1 < scenes.length) setIdx(idx + 1);
       else setDone(true);
-    }, 2000);
+    }, 2500);
   };
 
   if (done) {
+    const needsRetrain = mistakes >= 3;
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <div className="text-8xl">✅</div>
         <h2 className="text-3xl font-bold text-center">Test Drive Complete!</h2>
         <div className="text-6xl my-4"><span className="car">🛻</span>✨</div>
         <p className="text-lg text-center max-w-md opacity-80">
-          Your Cybertruck can drive and make decisions! But can it drive all by itself?
-          Time to unlock self-driving mode...
+          {mistakes === 0 ? "Perfect driving! The AI training paid off!" :
+           `${mistakes} mistake${mistakes > 1 ? "s" : ""}. ${needsRetrain ? "The car needs more training!" : "Not bad — but can it drive alone?"}`}
         </p>
-        <button className="btn btn-success mt-4" onClick={onComplete}>
-          Next Quest →
-        </button>
+        {needsRetrain ? (
+          <div className="flex gap-3 mt-4">
+            <button className="btn" style={{ background: "var(--accent)", color: "#0f172a" }} onClick={() => onComplete(true)}>
+              🔄 Retrain AI
+            </button>
+            <button className="btn" style={{ background: "var(--card)" }} onClick={() => onComplete(false)}>
+              Continue anyway →
+            </button>
+          </div>
+        ) : (
+          <button className="btn btn-success mt-4" onClick={() => onComplete(false)}>
+            Next Quest →
+          </button>
+        )}
       </div>
     );
   }
 
+  // AI's reasoning for this scene
+  const confColor = scene.confidence >= 70 ? "#4ade80" : scene.confidence >= 45 ? "#fbbf24" : "#ef4444";
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
+    <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <h2 className="text-3xl font-bold">🛻 Quest 4: Test Drive!</h2>
-      <p className="opacity-70 text-center max-w-md">
-        Your robot car is on the road! Help it decide what to do.
+      <p className="opacity-70 text-center max-w-md text-sm">
+        Your car is on the road! See what the AI thinks, then decide.
       </p>
 
-      <div className="text-sm opacity-70">{idx + 1} / {SCENES.length}</div>
+      <div className="text-sm opacity-70">{idx + 1} / {scenes.length}</div>
 
       {/* Road */}
       <div className="w-full max-w-lg h-28 bg-gray-800 rounded-2xl relative overflow-hidden">
@@ -69,9 +80,36 @@ export default function TestDrive({ onComplete }: { onComplete: () => void }) {
 
       <div className="text-xl font-semibold">{scene.label}</div>
 
+      {/* AI reasoning */}
+      <div className="rounded-xl p-3 text-sm max-w-xs" style={{ background: "rgba(255,255,255,0.05)" }}>
+        <div className="text-xs opacity-50 mb-1">🤖 AI sees:</div>
+        <div className="flex flex-wrap gap-1">
+          {scene.features.map((f) => (
+            <span key={f} className="rounded-full px-2 py-0.5 text-xs" style={{ background: "rgba(56,189,248,0.2)", color: "#38bdf8" }}>
+              {f}
+            </span>
+          ))}
+        </div>
+        <div className="mt-2 text-xs">
+          AI thinks: <b style={{ color: scene.aiChoice === "stop" ? "#ef4444" : "#4ade80" }}>{scene.aiChoice.toUpperCase()}</b>
+          {" "}({scene.confidence}% sure)
+        </div>
+      </div>
+
+      {/* Confidence bar */}
+      <div className="flex items-center gap-2 w-48">
+        <span className="text-xs opacity-60 w-20">Confidence:</span>
+        <div className="progress-track flex-1">
+          <div className="progress-fill" style={{ width: `${scene.confidence}%`, background: confColor }} />
+        </div>
+        <span className="text-sm font-bold" style={{ color: confColor }}>{scene.confidence}%</span>
+      </div>
+
       {picked ? (
         <div className="text-lg text-center fade-in" style={{ color: picked === scene.correct ? "var(--success)" : "var(--warn)" }}>
-          {picked === scene.correct ? `✅ ${scene.carAction}` : `❌ Not quite — the car should ${scene.correct}!`}
+          {picked === scene.correct
+            ? `✅ Correct! The car should ${scene.correct}!`
+            : `❌ Not quite — the car should ${scene.correct}!`}
         </div>
       ) : (
         <div className="flex gap-4 fade-in">
