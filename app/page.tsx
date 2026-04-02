@@ -35,6 +35,7 @@ export default function Home() {
   const [training, setTraining] = useState<TrainingData>({});
   const [completions, setCompletions] = useState(0);
   const [welcomed, setWelcomed] = useState(false);
+  const [started, setStarted] = useState(false);
   const { expired, dismiss } = useSessionTimer();
   const mobile = useMobile();
 
@@ -59,6 +60,26 @@ export default function Home() {
   if (expired) {
     stopMusic();
     return <SessionTimer onDismiss={dismiss} />;
+  }
+
+  // Splash screen — unlocks audio on first tap
+  if (!started) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
+        <CarBuddy mood="idle" size={mobile ? 100 : 160} />
+        <h1 className="text-4xl font-bold text-center">🚗 Build a Robot Car!</h1>
+        <p className="text-lg text-center opacity-70 max-w-md">
+          Learn how self-driving cars work through fun quests!
+        </p>
+        <button className="btn btn-primary text-xl mt-4" onClick={() => {
+          sfxTap();
+          setStarted(true);
+          speak(VOICE.welcome).then(() => speak(VOICE.menuSubtitle));
+        }}>
+          ▶️ Start!
+        </button>
+      </div>
+    );
   }
 
   if (phase === "menu") {
