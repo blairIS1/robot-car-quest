@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --accent: #38bdf8;
+  --accent2: #a78bfa;
+  --success: #4ade80;
+  --warn: #fbbf24;
+}
+
+body {
+  background: var(--bg);
+  color: white;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  margin: 0;
+}
+
+/* fun bouncy button */
+.btn {
+  padding: 14px 32px;
+  border-radius: 16px;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn:hover { transform: scale(1.05); }
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
+}
+
+.btn-success {
+  background: var(--success);
+  color: #0f172a;
+}
+
+/* draggable items */
+.draggable {
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.draggable:active { cursor: grabbing; transform: scale(1.1); }
+
+/* drop zone */
+.drop-zone {
+  border: 3px dashed rgba(255,255,255,0.3);
+  border-radius: 16px;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+.drop-zone.over {
+  border-color: var(--accent);
+  background: rgba(56, 189, 248, 0.1);
+}
+
+/* progress bar */
+.progress-track {
+  height: 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width 0.5s ease;
+}
+
+/* car animation */
+@keyframes drive {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(calc(100vw + 100%)); }
+}
+.car-driving { animation: drive 4s linear; }
+.car { display: inline-block; transform: scaleX(-1); }
+
+/* fade in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.5s ease forwards; }
+
+@keyframes pulse {
+  from { transform: scale(1); box-shadow: 0 0 10px rgba(239,68,68,0.4); }
+  to { transform: scale(1.08); box-shadow: 0 0 25px rgba(239,68,68,0.7); }
+}
