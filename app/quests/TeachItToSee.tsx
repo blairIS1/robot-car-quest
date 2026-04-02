@@ -5,10 +5,12 @@ import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
 import { speak, stopSpeaking, VOICE } from "./speak";
+import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function TeachItToSee({ onComplete }: { onComplete: (data: TrainingData) => void }) {
   const [items] = useState(() => [...TRAIN_ITEMS].sort(() => Math.random() - 0.5));
+  const mobile = useMobile();
   const [idx, setIdx] = useState(0);
   const [training, setTraining] = useState<TrainingData>({});
   const [feedback, setFeedback] = useState("");
@@ -47,7 +49,7 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={true} />
-        <CarBuddy mood="celebrate" size={120} />
+        <CarBuddy mood="celebrate" size={mobile ? 80 : 120} />
         <h2 className="text-3xl font-bold">👁️ Training Complete!</h2>
         <p className="text-xl">You labeled <b>{total}/{items.length}</b> correctly!</p>
         <button className="btn btn-success mt-4" onClick={() => { sfxTap(); stopSpeaking(); speak(VOICE.q3Done).then(() => onComplete(training)); }}>
@@ -61,13 +63,13 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <Confetti active={showConfetti} />
       <ReadableText voice={VOICE.q3Title} as="h2" className="text-3xl font-bold">👁️ Quest 3: Teach It to See!</ReadableText>
-      <CarBuddy mood={mood} size={80} />
+      <CarBuddy mood={mood} size={mobile ? 60 : 80} />
       <ReadableText voice={VOICE.q3Desc} as="p" className="opacity-70 text-center max-w-md text-sm">
         The car has cameras but its AI brain needs to learn. Should the car STOP or GO?
       </ReadableText>
 
       <div className="text-sm opacity-70">{idx + 1} / {items.length}</div>
-      <div className="progress-track w-64">
+      <div className="progress-track w-full max-w-64">
         <div className="progress-fill" style={{ width: `${(idx / items.length) * 100}%` }} />
       </div>
 

@@ -12,6 +12,7 @@ import ReadableText from "./quests/ReadableText";
 import SessionTimer, { useSessionTimer } from "./quests/SessionTimer";
 import { sfxTap, sfxCelebrate } from "./quests/sfx";
 import { speak, stopSpeaking, VOICE } from "./quests/speak";
+import { useMobile } from "./quests/useMobile";
 import { startMusic, stopMusic } from "./quests/music";
 import { recordCompletion, getCompletions } from "./quests/scores";
 import { TrainingData } from "./quests/data";
@@ -35,6 +36,7 @@ export default function Home() {
   const [completions, setCompletions] = useState(0);
   const [welcomed, setWelcomed] = useState(false);
   const { expired, dismiss } = useSessionTimer();
+  const mobile = useMobile();
 
   useEffect(() => { setCompletions(getCompletions()); }, []);
 
@@ -65,7 +67,7 @@ export default function Home() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={completed.every(Boolean)} />
-        <CarBuddy mood={completed.every(Boolean) ? "celebrate" : "idle"} size={140} />
+        <CarBuddy mood={completed.every(Boolean) ? "celebrate" : "idle"} size={mobile ? 90 : 140} />
         <ReadableText voice={VOICE.menuTitle} as="h1" className="text-4xl font-bold text-center">
           Build a Robot Car!
         </ReadableText>

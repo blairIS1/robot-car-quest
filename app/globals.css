@@ -9,11 +9,47 @@
   --warn: #fbbf24;
 }
 
+/* Prevent overscroll bounce on mobile */
+html, body {
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background: var(--bg);
   color: white;
   font-family: "Segoe UI", system-ui, sans-serif;
   margin: 0;
+  min-height: 100dvh;
+}
+
+/* ===== Mobile-first responsive ===== */
+
+/* Tighten padding & gaps on small screens */
+@media (max-width: 480px) {
+  .fade-in { padding-left: 16px !important; padding-right: 16px !important; padding-top: 16px !important; padding-bottom: 16px !important; }
+  .fade-in { gap: 12px !important; }
+  .btn { padding: 12px 20px; font-size: 1rem; }
+  .btn.text-2xl { font-size: 1.25rem; }
+  .btn.text-3xl { font-size: 1.5rem; }
+  .progress-track { height: 10px; }
+}
+
+/* Scale down text on small screens */
+@media (max-width: 480px) {
+  h1, .text-4xl { font-size: 1.75rem !important; }
+  h2, .text-3xl { font-size: 1.4rem !important; }
+  .text-2xl { font-size: 1.15rem !important; }
+  .text-xl { font-size: 1.05rem !important; }
+  .text-lg { font-size: 0.95rem !important; }
+  .text-8xl { font-size: 4rem !important; }
+  .text-5xl { font-size: 2.5rem !important; }
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .fade-in { padding-left: 24px !important; padding-right: 24px !important; }
+  h1, .text-4xl { font-size: 2rem !important; }
 }
 
 /* fun bouncy button */
@@ -25,6 +61,10 @@ body {
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
+  /* Mobile: prevent text selection on long press */
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 .btn:hover { transform: scale(1.05); }
 .btn:active { animation: btn-squash 0.2s ease; }

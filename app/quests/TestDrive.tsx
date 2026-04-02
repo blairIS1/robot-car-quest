@@ -5,10 +5,12 @@ import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
 import { speak, stopSpeaking, VOICE } from "./speak";
+import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function TestDrive({ training, onComplete }: { training: TrainingData; onComplete: (needsRetrain: boolean) => void }) {
   const [scenes] = useState(() => generateTestScenes(training));
+  const mobile = useMobile();
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [mistakes, setMistakes] = useState(0);
@@ -48,7 +50,7 @@ export default function TestDrive({ training, onComplete }: { training: Training
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={!needsRetrain} />
-        <CarBuddy mood={needsRetrain ? "scared" : "celebrate"} size={120} />
+        <CarBuddy mood={needsRetrain ? "scared" : "celebrate"} size={mobile ? 80 : 120} />
         <h2 className="text-3xl font-bold text-center">Test Drive Complete!</h2>
         <p className="text-lg text-center max-w-md opacity-80">
           {mistakes === 0 ? "Perfect driving! The AI training paid off!" :
@@ -78,14 +80,14 @@ export default function TestDrive({ training, onComplete }: { training: Training
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <Confetti active={showConfetti} />
       <ReadableText voice={VOICE.q4Title} as="h2" className="text-3xl font-bold">🛻 Quest 4: Test Drive!</ReadableText>
-      <CarBuddy mood={mood} size={80} />
+      <CarBuddy mood={mood} size={mobile ? 60 : 80} />
       <ReadableText voice={VOICE.q4Desc} as="p" className="opacity-70 text-center max-w-md text-sm">
         Your car is on the road! See what the AI thinks, then decide.
       </ReadableText>
 
       <div className="text-sm opacity-70">{idx + 1} / {scenes.length}</div>
 
-      <div className="w-full max-w-lg h-28 bg-gray-800 rounded-2xl relative overflow-hidden">
+      <div className="w-full max-w-lg h-20 sm:h-28 bg-gray-800 rounded-2xl relative overflow-hidden">
         <div className="absolute bottom-0 w-full h-1 bg-gray-600" />
         <div className="text-5xl absolute bottom-3 transition-all car" style={{ left: `${carPos}%`, transitionDuration: "0.15s" }}>🛻</div>
         <div className="text-5xl absolute top-3 right-8">{scene.emoji}</div>
@@ -108,7 +110,7 @@ export default function TestDrive({ training, onComplete }: { training: Training
         </div>
       </div>
 
-      <div className="flex items-center gap-2 w-48">
+      <div className="flex items-center gap-2 w-full max-w-48">
         <span className="text-xs opacity-60 w-20">Confidence:</span>
         <div className="progress-track flex-1">
           <div className="progress-fill" style={{ width: `${scene.confidence}%`, background: confColor }} />

@@ -4,10 +4,12 @@ import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxEngine, sfxBrake, sfxTap, sfxCelebrate } from "./sfx";
 import { speak, stopSpeaking, VOICE } from "./speak";
+import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
   const [speed, setSpeed] = useState(0);
+  const mobile = useMobile();
   const [battery, setBattery] = useState(80);
   const [braking, setBraking] = useState(false);
   const [learned, setLearned] = useState({ drove: false, regen: false });
@@ -44,18 +46,18 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
       <Confetti active={done} />
       <ReadableText voice={VOICE.q2Title} as="h2" className="text-3xl font-bold">🔄 Quest 2: Make It Move!</ReadableText>
-      <CarBuddy mood={mood} size={100} />
+      <CarBuddy mood={mood} size={mobile ? 70 : 100} />
       <ReadableText voice={VOICE.q2Desc} as="p" className="opacity-70 text-center max-w-md text-sm">
         An electric motor spins to move the car. When you brake, the motor runs
         backwards and charges the battery! This is called <b>regenerative braking</b>.
       </ReadableText>
 
-      <div className="w-full max-w-lg h-24 bg-gray-800 rounded-2xl relative overflow-hidden flex items-end">
+      <div className="w-full max-w-lg h-20 sm:h-24 bg-gray-800 rounded-2xl relative overflow-hidden flex items-end">
         <div className="absolute bottom-0 w-full h-1 bg-gray-600" />
         <div className="text-5xl absolute bottom-2 transition-all duration-200 car" style={{ left: `${Math.min(carX, 85)}%` }}>🛻</div>
       </div>
 
-      <div className="w-64">
+      <div className="w-full max-w-64">
         <div className="flex justify-between text-sm opacity-70 mb-1">
           <span>🔋 Battery</span>
           <span>{Math.round(battery)}%</span>
@@ -68,7 +70,7 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
 
       <div className="flex flex-col items-center gap-3">
         <label className="text-sm opacity-70">Speed: {speed}</label>
-        <input type="range" min={0} max={5} value={speed} onChange={(e) => { setSpeed(Number(e.target.value)); if (Number(e.target.value) > 0) sfxEngine(); }} className="w-64" />
+        <input type="range" min={0} max={5} value={speed} onChange={(e) => { setSpeed(Number(e.target.value)); if (Number(e.target.value) > 0) sfxEngine(); }} className="w-full max-w-64" />
         <button
           className={`btn text-xl ${braking ? "btn-success" : "btn-primary"}`}
           onPointerDown={() => { setBraking(true); sfxBrake(); }}
