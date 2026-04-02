@@ -34,7 +34,6 @@ export default function Home() {
   const [completed, setCompleted] = useState<boolean[]>([false, false, false, false, false]);
   const [training, setTraining] = useState<TrainingData>({});
   const [completions, setCompletions] = useState(0);
-  const [welcomed, setWelcomed] = useState(false);
   const [started, setStarted] = useState(false);
   const { expired, dismiss } = useSessionTimer();
   const mobile = useMobile();
@@ -56,28 +55,6 @@ export default function Home() {
     return <SessionTimer onDismiss={dismiss} />;
   }
 
-  // Splash screen — unlocks audio on first tap
-  if (!started) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
-        <CarBuddy mood="idle" size={mobile ? 100 : 160} />
-        <h1 className="text-4xl font-bold text-center">🚗 Build a Robot Car!</h1>
-        <p className="text-lg text-center opacity-70 max-w-md">
-          Learn how self-driving cars work through fun quests!
-        </p>
-        <button className="btn btn-primary text-xl mt-4" onClick={() => {
-          sfxTap();
-          setStarted(true);
-          setWelcomed(true);
-          startMusic();
-          speak(VOICE.welcome).then(() => speak(VOICE.menuSubtitle));
-        }}>
-          ▶️ Start!
-        </button>
-      </div>
-    );
-  }
-
   if (phase === "menu") {
     const questPhases: Phase[] = ["q1", "q2", "q3", "q4", "q5"];
     const partsCollected = completed.filter(Boolean).length;
@@ -92,41 +69,54 @@ export default function Home() {
           Collect all 5 parts to build your self-driving car!
         </ReadableText>
 
-        <div className="flex gap-3">
-          {PARTS.map((part, i) => (
-            <div key={i} className="flex flex-col items-center gap-1 readable-text"
-              style={{ opacity: completed[part.quest] ? 1 : 0.3, cursor: "pointer" }}
-              onClick={() => { sfxTap(); speak(part.voice); }}>
-              <span className="text-3xl" style={{ filter: completed[part.quest] ? "none" : "grayscale(1)" }}>{part.emoji}</span>
-              <span className="text-xs">{part.label} <span className="read-icon">🔊</span></span>
+        {!started ? (
+          <button className="btn btn-primary text-xl mt-4" onClick={() => {
+            sfxTap();
+            setStarted(true);
+            startMusic();
+            speak(VOICE.welcome).then(() => speak(VOICE.menuSubtitle));
+          }}>
+            ▶️ Start!
+          </button>
+        ) : (
+          <>
+            <div className="flex gap-3">
+              {PARTS.map((part, i) => (
+                <div key={i} className="flex flex-col items-center gap-1 readable-text"
+                  style={{ opacity: completed[part.quest] ? 1 : 0.3, cursor: "pointer" }}
+                  onClick={() => { sfxTap(); speak(part.voice); }}>
+                  <span className="text-3xl" style={{ filter: completed[part.quest] ? "none" : "grayscale(1)" }}>{part.emoji}</span>
+                  <span className="text-xs">{part.label} <span className="read-icon">🔊</span></span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <ReadableText voice={VOICE.menuParts} as="div" className="text-sm opacity-60">
-          {partsCollected}/5 parts collected
-        </ReadableText>
+            <ReadableText voice={VOICE.menuParts} as="div" className="text-sm opacity-60">
+              {partsCollected}/5 parts collected
+            </ReadableText>
 
-        {completions > 0 && <p className="text-xs opacity-40">🏆 Completed {completions} time{completions > 1 ? "s" : ""}</p>}
+            {completions > 0 && <p className="text-xs opacity-40">🏆 Completed {completions} time{completions > 1 ? "s" : ""}</p>}
 
-        <div className="flex flex-col gap-3 w-full max-w-sm">
-          {QUESTS.map((name, i) => (
-            <button
-              key={i}
-              className="btn btn-primary flex justify-between items-center"
-              style={{ opacity: i === 0 || completed[i - 1] ? 1 : 0.4 }}
-              disabled={i > 0 && !completed[i - 1]}
-              onClick={() => startQuest(questPhases[i])}
-            >
-              <span>{name}</span>
-              {completed[i] ? <span>✅</span> : <span className="opacity-40">{PARTS[i].emoji}</span>}
-            </button>
-          ))}
-        </div>
+            <div className="flex flex-col gap-3 w-full max-w-sm fade-in">
+              {QUESTS.map((name, i) => (
+                <button
+                  key={i}
+                  className="btn btn-primary flex justify-between items-center"
+                  style={{ opacity: i === 0 || completed[i - 1] ? 1 : 0.4 }}
+                  disabled={i > 0 && !completed[i - 1]}
+                  onClick={() => startQuest(questPhases[i])}
+                >
+                  <span>{name}</span>
+                  {completed[i] ? <span>✅</span> : <span className="opacity-40">{PARTS[i].emoji}</span>}
+                </button>
+              ))}
+            </div>
 
-        {completed.every(Boolean) && (
-          <ReadableText voice={VOICE.menuAllDone} as="div" className="text-xl font-bold text-center fade-in" style={{ color: "var(--success)" }}>
-            🎉 All parts collected! Your robot car is complete!
-          </ReadableText>
+            {completed.every(Boolean) && (
+              <ReadableText voice={VOICE.menuAllDone} as="div" className="text-xl font-bold text-center fade-in" style={{ color: "var(--success)" }}>
+                🎉 All parts collected! Your robot car is complete!
+              </ReadableText>
+            )}
+          </>
         )}
       </div>
     );
