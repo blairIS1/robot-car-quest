@@ -4,14 +4,14 @@ import { TrainingData, generateSelfDrivingEvents } from "./data";
 import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap, sfxBrake, sfxCelebrate } from "./sfx";
-import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile, useSpeaking } from "./useMobile";
+import { stopSpeaking, useNarrate, VOICE } from "./speak";
+import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function SelfDriving({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
   const [events] = useState(() => generateSelfDrivingEvents(training));
   const mobile = useMobile();
-  const talking = useSpeaking();
+  const { talking, narrate } = useNarrate([VOICE.q5Start]);
   const [idx, setIdx] = useState(0);
   const [carPos, setCarPos] = useState(10);
   const [phase, setPhase] = useState<"driving" | "event" | "result">("driving");
@@ -22,20 +22,15 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
   const [done, setDone] = useState(false);
   const [timer, setTimer] = useState(0);
 
-  useEffect(() => {
-    speak(VOICE.q5Start);
-    return () => stopSpeaking();
-  }, []);
-
   const event = events[idx];
   const aiWrong = event.correct !== event.aiChoice;
 
   useEffect(() => {
-    if (phase !== "driving") return;
+    if (phase !== "driving" || talking) return;
     const t = setInterval(() => setCarPos((p) => Math.min(p + 1, 70)), 60);
     const show = setTimeout(() => { setPhase("event"); setTimer(0); }, 1500);
     return () => { clearInterval(t); clearTimeout(show); };
-  }, [phase]);
+  }, [phase, talking]);
 
   useEffect(() => {
     if (phase !== "event") return;
@@ -50,17 +45,17 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
 
   useEffect(() => {
     if (!aiActed || phase !== "event") return;
-    if (aiWrong) { setCrashes((c) => c + 1); sfxWrong(); speak(VOICE.q5Crash); }
-    else { sfxCorrect(); speak(VOICE.q5AiRight); }
+    if (aiWrong) { setCrashes((c) => c + 1); sfxWrong(); narrate(VOICE.q5Crash); }
+    else { sfxCorrect(); narrate(VOICE.q5AiRight); }
     setPhase("result");
-  }, [aiActed, phase, aiWrong]);
+  }, [aiActed, phase, aiWrong, narrate]);
 
   const override = useCallback(() => {
     if (phase !== "event" || aiActed) return;
     setOverridden(true);
     setPhase("result");
-    if (aiWrong) { setSaves((s) => s + 1); sfxBrake(); sfxCorrect(); speak(VOICE.q5Save); }
-  }, [phase, aiActed, aiWrong]);
+    if (aiWrong) { setSaves((s) => s + 1); sfxBrake(); sfxCorrect(); narrate(VOICE.q5Save); }
+  }, [phase, aiActed, aiWrong, narrate]);
 
   const getResult = () => {
     if (overridden) {

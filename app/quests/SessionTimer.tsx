@@ -1,13 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import CarBuddy from "./CarBuddy";
-import { useMobile, useSpeaking } from "./useMobile";
+import { useNarrate } from "./speak";
+import { useMobile } from "./useMobile";
 
 const SESSION_LIMIT = 12 * 60;
 
 export default function SessionTimer({ onDismiss }: { onDismiss: () => void }) {
   const mobile = useMobile();
-  const talking = useSpeaking();
+  const { talking } = useNarrate([]);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
       <CarBuddy mood="happy" size={mobile ? 90 : 140} talking={talking} />

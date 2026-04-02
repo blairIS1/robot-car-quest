@@ -1,24 +1,19 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxTap, sfxCorrect, sfxWrong } from "./sfx";
-import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile, useSpeaking } from "./useMobile";
+import { stopSpeaking, useNarrate, VOICE } from "./speak";
+import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function PowerUp({ onComplete }: { onComplete: () => void }) {
   const [batteries, setBatteries] = useState(0);
   const mobile = useMobile();
-  const talking = useSpeaking();
+  const { talking, narrate } = useNarrate([VOICE.q1Start]);
   const ideal = 4;
   const max = 7;
   const status = batteries === 0 ? "empty" : batteries < ideal ? "low" : batteries === ideal ? "perfect" : batteries <= max ? "heavy" : "overload";
-
-  useEffect(() => {
-    speak(VOICE.q1Start);
-    return () => stopSpeaking();
-  }, []);
 
   const msg: Record<string, string> = {
     empty: "Tap the batteries to add them to your car! 🔋",
@@ -54,14 +49,14 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
       <div className="text-lg text-center font-semibold min-h-[2em]">{msg[status]}</div>
 
       <div className="flex gap-3">
-        <button className="btn btn-primary text-3xl" onClick={() => {
+        <button className="btn btn-primary text-3xl" disabled={talking} onClick={() => {
           sfxTap();
           const n = Math.min(batteries + 1, max + 1);
           setBatteries(n);
-          if (n === ideal) { sfxCorrect(); speak(VOICE.q1Perfect); }
-          else if (n > max) { sfxWrong(); speak(VOICE.q1TooMany); }
+          if (n === ideal) { sfxCorrect(); narrate(VOICE.q1Perfect); }
+          else if (n > max) { sfxWrong(); narrate(VOICE.q1TooMany); }
         }}>🔋 +1</button>
-        <button className="btn text-3xl" style={{ background: "#475569" }} onClick={() => { sfxTap(); setBatteries(Math.max(batteries - 1, 0)); }}>➖</button>
+        <button className="btn text-3xl" disabled={talking} style={{ background: "#475569" }} onClick={() => { sfxTap(); setBatteries(Math.max(batteries - 1, 0)); }}>➖</button>
       </div>
 
       {status === "perfect" && (

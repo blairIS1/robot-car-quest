@@ -3,22 +3,17 @@ import { useState, useEffect } from "react";
 import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxEngine, sfxBrake, sfxTap, sfxCelebrate } from "./sfx";
-import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile, useSpeaking } from "./useMobile";
+import { stopSpeaking, useNarrate, VOICE } from "./speak";
+import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
   const [speed, setSpeed] = useState(0);
   const mobile = useMobile();
-  const talking = useSpeaking();
+  const { talking, narrate } = useNarrate([VOICE.q2Start]);
   const [battery, setBattery] = useState(80);
   const [braking, setBraking] = useState(false);
   const [learned, setLearned] = useState({ drove: false, regen: false });
-
-  useEffect(() => {
-    speak(VOICE.q2Start);
-    return () => stopSpeaking();
-  }, []);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -32,12 +27,12 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
   }, [speed, braking]);
 
   useEffect(() => {
-    if (speed >= 3 && !learned.drove) { setLearned((l) => ({ ...l, drove: true })); sfxEngine(); speak(VOICE.q2Fast); }
-  }, [speed, learned.drove]);
+    if (speed >= 3 && !learned.drove) { setLearned((l) => ({ ...l, drove: true })); sfxEngine(); narrate(VOICE.q2Fast); }
+  }, [speed, learned.drove, narrate]);
 
   useEffect(() => {
-    if (braking && battery > 82 && !learned.regen) { setLearned((l) => ({ ...l, regen: true })); sfxCelebrate(); speak(VOICE.q2Regen); }
-  }, [braking, battery, learned.regen]);
+    if (braking && battery > 82 && !learned.regen) { setLearned((l) => ({ ...l, regen: true })); sfxCelebrate(); narrate(VOICE.q2Regen); }
+  }, [braking, battery, learned.regen, narrate]);
 
   const done = learned.drove && learned.regen;
   const carX = speed * 8;
@@ -71,9 +66,10 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
 
       <div className="flex flex-col items-center gap-3">
         <label className="text-sm opacity-70">Speed: {speed}</label>
-        <input type="range" min={0} max={5} value={speed} onChange={(e) => { setSpeed(Number(e.target.value)); if (Number(e.target.value) > 0) sfxEngine(); }} className="w-full max-w-64" />
+        <input type="range" min={0} max={5} value={speed} disabled={talking} onChange={(e) => { setSpeed(Number(e.target.value)); if (Number(e.target.value) > 0) sfxEngine(); }} className="w-full max-w-64" />
         <button
           className={`btn text-xl ${braking ? "btn-success" : "btn-primary"}`}
+          disabled={talking}
           onPointerDown={() => { setBraking(true); sfxBrake(); }}
           onPointerUp={() => setBraking(false)}
           onPointerLeave={() => setBraking(false)}

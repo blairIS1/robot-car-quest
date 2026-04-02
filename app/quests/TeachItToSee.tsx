@@ -1,28 +1,23 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { TRAIN_ITEMS, TrainingData } from "./data";
 import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
-import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile, useSpeaking } from "./useMobile";
+import { stopSpeaking, useNarrate, VOICE } from "./speak";
+import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function TeachItToSee({ onComplete }: { onComplete: (data: TrainingData) => void }) {
   const [items] = useState(() => [...TRAIN_ITEMS].sort(() => Math.random() - 0.5));
   const mobile = useMobile();
-  const talking = useSpeaking();
+  const { talking, narrate } = useNarrate([VOICE.q2Done, VOICE.q3Start]);
   const [idx, setIdx] = useState(0);
   const [training, setTraining] = useState<TrainingData>({});
   const [feedback, setFeedback] = useState("");
   const [mood, setMood] = useState<"idle" | "happy" | "scared">("idle");
   const [showConfetti, setShowConfetti] = useState(false);
   const [done, setDone] = useState(false);
-
-  useEffect(() => {
-    speak(VOICE.q2Done).then(() => speak(VOICE.q3Start));
-    return () => stopSpeaking();
-  }, []);
 
   const current = items[idx];
 
@@ -32,11 +27,11 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
       sfxCorrect(); setMood("happy"); setShowConfetti(true);
       setTraining((t) => ({ ...t, [current.category]: (t[current.category] || 0) + 1 }));
       setFeedback("✅ Correct! The car learned about " + current.label + "!");
-      speak(VOICE.q3Correct);
+      narrate(VOICE.q3Correct);
     } else {
       sfxWrong(); setMood("scared");
       setFeedback(`Oops! The car should ${current.answer} for "${current.label}" 😅`);
-      speak(VOICE.q3Wrong);
+      narrate(VOICE.q3Wrong);
     }
     setTimeout(() => {
       setFeedback(""); setMood("idle"); setShowConfetti(false);
@@ -81,8 +76,8 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
 
       {!feedback && (
         <div className="flex gap-4 fade-in">
-          <button className="btn text-2xl" style={{ background: "#ef4444" }} onClick={() => { sfxTap(); answer("stop"); }}>🛑 STOP</button>
-          <button className="btn text-2xl" style={{ background: "var(--success)", color: "#0f172a" }} onClick={() => { sfxTap(); answer("go"); }}>✅ GO</button>
+          <button className="btn text-2xl" disabled={talking} style={{ background: "#ef4444" }} onClick={() => { sfxTap(); answer("stop"); }}>🛑 STOP</button>
+          <button className="btn text-2xl" disabled={talking} style={{ background: "var(--success)", color: "#0f172a" }} onClick={() => { sfxTap(); answer("go"); }}>✅ GO</button>
         </div>
       )}
     </div>

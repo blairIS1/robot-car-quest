@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 const BASE = "/robot-car-quest/audio/";
 let current: HTMLAudioElement | null = null;
@@ -13,7 +14,7 @@ function setSpeaking(v: boolean) {
   listeners.forEach((fn) => fn(v));
 }
 
-export function onSpeakingChange(fn: (v: boolean) => void) {
+function onSpeakingChange(fn: (v: boolean) => void) {
   listeners.add(fn);
   return () => { listeners.delete(fn); };
 }
@@ -41,6 +42,37 @@ export function stopSpeaking() {
   if (current) { current.pause(); current = null; }
   queue = Promise.resolve();
   setSpeaking(false);
+}
+
+/**
+ * useNarrate — plays a sequence of voice lines on mount.
+ * Returns `talking` (true while audio plays) and `narrate` (queue a one-off line).
+ * Cleans up on unmount — no audio bleed.
+ */
+export function useNarrate(introSequence: string[]) {
+  const [talking, setTalking] = useState(introSequence.length > 0);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    const unsub = onSpeakingChange((v) => { if (mountedRef.current) setTalking(v); });
+
+    // Play intro sequence
+    let chain: Promise<void> = Promise.resolve();
+    for (const key of introSequence) {
+      chain = chain.then(() => speak(key));
+    }
+
+    return () => {
+      mountedRef.current = false;
+      unsub();
+      stopSpeaking();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const narrate = useCallback((key: string) => { speak(key); }, []);
+
+  return { talking, narrate };
 }
 
 export const VOICE = {

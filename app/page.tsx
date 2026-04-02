@@ -11,8 +11,8 @@ import Confetti from "./quests/Confetti";
 import ReadableText from "./quests/ReadableText";
 import SessionTimer, { useSessionTimer } from "./quests/SessionTimer";
 import { sfxTap, sfxCelebrate } from "./quests/sfx";
-import { speak, stopSpeaking, VOICE } from "./quests/speak";
-import { useMobile, useSpeaking } from "./quests/useMobile";
+import { speak, stopSpeaking, useNarrate, VOICE } from "./quests/speak";
+import { useMobile } from "./quests/useMobile";
 import { startMusic, stopMusic } from "./quests/music";
 import { recordCompletion, getCompletions } from "./quests/scores";
 import { TrainingData } from "./quests/data";
@@ -37,7 +37,8 @@ export default function Home() {
   const [started, setStarted] = useState(false);
   const { expired, dismiss } = useSessionTimer();
   const mobile = useMobile();
-  const talking = useSpeaking();
+  // Menu narration — only plays after Start is tapped (started=true triggers remount via key)
+  const { talking } = useNarrate(started ? [VOICE.welcome, VOICE.menuSubtitle] : []);
 
   useEffect(() => { setCompletions(getCompletions()); }, []);
 
@@ -71,7 +72,7 @@ export default function Home() {
         </ReadableText>
 
         {!started ? (
-          <button className="btn btn-primary text-xl mt-4" disabled={talking} onClick={() => {
+          <button className="btn btn-primary text-xl mt-4" onClick={() => {
             sfxTap();
             setStarted(true);
             startMusic();

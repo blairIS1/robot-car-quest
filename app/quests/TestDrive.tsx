@@ -4,14 +4,14 @@ import { TrainingData, generateTestScenes } from "./data";
 import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
-import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile, useSpeaking } from "./useMobile";
+import { stopSpeaking, useNarrate, VOICE } from "./speak";
+import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function TestDrive({ training, onComplete }: { training: TrainingData; onComplete: (needsRetrain: boolean) => void }) {
   const [scenes] = useState(() => generateTestScenes(training));
   const mobile = useMobile();
-  const talking = useSpeaking();
+  const { talking, narrate } = useNarrate([VOICE.q4Start]);
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [mistakes, setMistakes] = useState(0);
@@ -19,11 +19,6 @@ export default function TestDrive({ training, onComplete }: { training: Training
   const [showConfetti, setShowConfetti] = useState(false);
   const [done, setDone] = useState(false);
   const [carPos, setCarPos] = useState(10);
-
-  useEffect(() => {
-    speak(VOICE.q4Start);
-    return () => stopSpeaking();
-  }, []);
 
   const scene = scenes[idx];
 
@@ -37,8 +32,8 @@ export default function TestDrive({ training, onComplete }: { training: Training
 
   const choose = (c: string) => {
     setPicked(c);
-    if (c === scene.correct) { sfxCorrect(); setMood("happy"); setShowConfetti(true); speak(VOICE.q4Correct); }
-    else { sfxWrong(); setMood("scared"); setMistakes((m) => m + 1); speak(VOICE.q4Wrong); }
+    if (c === scene.correct) { sfxCorrect(); setMood("happy"); setShowConfetti(true); narrate(VOICE.q4Correct); }
+    else { sfxWrong(); setMood("scared"); setMistakes((m) => m + 1); narrate(VOICE.q4Wrong); }
     setTimeout(() => {
       setPicked(null); setMood("thinking"); setShowConfetti(false);
       if (idx + 1 < scenes.length) setIdx(idx + 1);
@@ -127,10 +122,10 @@ export default function TestDrive({ training, onComplete }: { training: Training
         </div>
       ) : (
         <div className="flex gap-4 fade-in">
-          <button className="btn text-2xl" style={{ background: "#ef4444" }} onClick={() => { sfxTap(); choose("stop"); }}>
+          <button className="btn text-2xl" disabled={talking} style={{ background: "#ef4444" }} onClick={() => { sfxTap(); choose("stop"); }}>
             🛑 STOP
           </button>
-          <button className="btn text-2xl" style={{ background: "var(--success)", color: "#0f172a" }} onClick={() => { sfxTap(); choose("go"); }}>
+          <button className="btn text-2xl" disabled={talking} style={{ background: "var(--success)", color: "#0f172a" }} onClick={() => { sfxTap(); choose("go"); }}>
             ✅ GO
           </button>
         </div>

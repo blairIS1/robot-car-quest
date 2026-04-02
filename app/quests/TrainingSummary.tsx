@@ -1,17 +1,15 @@
 "use client";
-import { useEffect } from "react";
 import { CATEGORIES, TrainingData, getConfidence } from "./data";
 import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxTap } from "./sfx";
-import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile, useSpeaking } from "./useMobile";
+import { stopSpeaking, useNarrate, VOICE } from "./speak";
+import { useMobile } from "./useMobile";
 
 const CAT_EMOJI: Record<string, string> = { lights: "🚦", signs: "🛑", people: "🚶", animals: "🐕", obstacles: "🚧" };
 
 export default function TrainingSummary({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
   const mobile = useMobile();
-  const talking = useSpeaking();
   const total = Object.values(training).reduce((a, b) => a + b, 0);
   const missing = CATEGORIES.filter((c) => !training[c]);
 
@@ -19,10 +17,9 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
   const maxCount = training[maxCat] || 0;
   const isBiased = total > 0 && maxCount / total > 0.5;
 
-  useEffect(() => {
-    speak(VOICE.q3Done).then(() => speak(VOICE.summary)).then(() => { if (isBiased) speak(VOICE.summaryBias); });
-    return () => stopSpeaking();
-  }, [isBiased]);
+  const introSequence: string[] = [VOICE.q3Done, VOICE.summary];
+  if (isBiased) introSequence.push(VOICE.summaryBias);
+  const { talking } = useNarrate(introSequence);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
