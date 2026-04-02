@@ -5,27 +5,33 @@ import MakeItMove from "./quests/MakeItMove";
 import TeachItToSee from "./quests/TeachItToSee";
 import TestDrive from "./quests/TestDrive";
 import SelfDriving from "./quests/SelfDriving";
+import AnimalSorter from "./quests/animal-sorter";
 
-const QUESTS = ["⚡ Power Up", "🔄 Make It Move", "👁️ Teach It to See", "🛻 Test Drive", "🤖 Self-Driving"];
+const QUESTS = [
+  "⚡ Power Up", "🔄 Make It Move", "👁️ Teach It to See", "🛻 Test Drive", "🤖 Self-Driving",
+  "🐾 Animal Sorter",
+];
+
+const COMPONENTS = [PowerUp, MakeItMove, TeachItToSee, TestDrive, SelfDriving, AnimalSorter];
 
 export default function Home() {
   const [quest, setQuest] = useState(-1);
-  const [completed, setCompleted] = useState<boolean[]>([false, false, false, false, false]);
+  const [completed, setCompleted] = useState<boolean[]>(new Array(QUESTS.length).fill(false));
 
   const complete = () => {
     const next = [...completed];
     next[quest] = true;
     setCompleted(next);
-    setQuest(quest + 1 <= 4 ? quest + 1 : -1);
+    setQuest(quest + 1 < QUESTS.length ? quest + 1 : -1);
   };
 
   if (quest === -1) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-8 p-8 fade-in">
         <div className="text-8xl"><span className="car">🛻</span></div>
-        <h1 className="text-4xl font-bold text-center">Build a Robot Car!</h1>
+        <h1 className="text-4xl font-bold text-center">AI Quests for Kids!</h1>
         <p className="text-lg text-center opacity-70 max-w-md">
-          Learn how a Tesla works by building your own robot car — step by step!
+          Learn how AI works by building a robot car and teaching a robot to see!
         </p>
         <div className="flex flex-col gap-3 w-full max-w-sm">
           {QUESTS.map((name, i) => (
@@ -43,13 +49,13 @@ export default function Home() {
         </div>
         {completed.every(Boolean) && (
           <div className="text-2xl font-bold text-center fade-in" style={{ color: "var(--success)" }}>
-            🎉 You built a self-driving robot car! Amazing job!
+            🎉 You completed all AI Quests! Amazing job!
           </div>
         )}
       </div>
     );
   }
 
-  const Q = [PowerUp, MakeItMove, TeachItToSee, TestDrive, SelfDriving][quest];
+  const Q = COMPONENTS[quest];
   return <Q onComplete={complete} />;
 }

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "🛻 Build a Robot Car!",
-  description: "Learn how a Tesla works by building your own robot car",
+  title: "🧠 AI Quests for Kids!",
+  description: "Learn how AI works through fun interactive quests",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
