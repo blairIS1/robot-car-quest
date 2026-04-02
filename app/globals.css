@@ -103,3 +103,20 @@ body {
   from { transform: scale(1); box-shadow: 0 0 10px rgba(239,68,68,0.4); }
   to { transform: scale(1.08); box-shadow: 0 0 25px rgba(239,68,68,0.7); }
 }
+
+/* ReadableText — tappable text with speaker icon */
+.readable-text {
+  cursor: pointer;
+  position: relative;
+}
+.readable-text .read-icon {
+  font-size: 0.5em;
+  opacity: 0.3;
+  vertical-align: middle;
+  margin-left: 4px;
+  transition: opacity 0.2s;
+}
+.readable-text:hover .read-icon,
+.readable-text:active .read-icon {
+  opacity: 1;
+}

@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { TRAIN_ITEMS, TrainingData } from "./data";
 import CarBuddy from "./CarBuddy";
+import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
-import { speak, VOICE } from "./speak";
+import { speak, stopSpeaking, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function TeachItToSee({ onComplete }: { onComplete: (data: TrainingData) => void }) {
@@ -15,7 +16,10 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
   const [showConfetti, setShowConfetti] = useState(false);
   const [done, setDone] = useState(false);
 
-  useEffect(() => { speak(VOICE.q3Start); }, []);
+  useEffect(() => {
+    speak(VOICE.q3Start);
+    return () => stopSpeaking();
+  }, []);
 
   const current = items[idx];
 
@@ -46,7 +50,7 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
         <CarBuddy mood="celebrate" size={120} />
         <h2 className="text-3xl font-bold">👁️ Training Complete!</h2>
         <p className="text-xl">You labeled <b>{total}/{items.length}</b> correctly!</p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); speak(VOICE.q3Done).then(() => onComplete(training)); }}>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); stopSpeaking(); speak(VOICE.q3Done).then(() => onComplete(training)); }}>
           See Training Results →
         </button>
       </div>
@@ -56,11 +60,11 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <Confetti active={showConfetti} />
-      <h2 className="text-3xl font-bold">👁️ Quest 3: Teach It to See!</h2>
+      <ReadableText voice={VOICE.q3Title} as="h2" className="text-3xl font-bold">👁️ Quest 3: Teach It to See!</ReadableText>
       <CarBuddy mood={mood} size={80} />
-      <p className="opacity-70 text-center max-w-md text-sm">
+      <ReadableText voice={VOICE.q3Desc} as="p" className="opacity-70 text-center max-w-md text-sm">
         The car has cameras but its AI brain needs to learn. Should the car STOP or GO?
-      </p>
+      </ReadableText>
 
       <div className="text-sm opacity-70">{idx + 1} / {items.length}</div>
       <div className="progress-track w-64">

@@ -2,8 +2,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { TrainingData, generateSelfDrivingEvents } from "./data";
 import CarBuddy from "./CarBuddy";
+import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap, sfxBrake, sfxCelebrate } from "./sfx";
-import { speak, VOICE } from "./speak";
+import { speak, stopSpeaking, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function SelfDriving({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
@@ -18,7 +19,10 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
   const [done, setDone] = useState(false);
   const [timer, setTimer] = useState(0);
 
-  useEffect(() => { speak(VOICE.q5Start); }, []);
+  useEffect(() => {
+    speak(VOICE.q5Start);
+    return () => stopSpeaking();
+  }, []);
 
   const event = events[idx];
   const aiWrong = event.correct !== event.aiChoice;
@@ -80,16 +84,16 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={true} />
         <CarBuddy mood="celebrate" size={140} />
-        <h2 className="text-3xl font-bold text-center">Self-Driving Complete!</h2>
+        <ReadableText voice={VOICE.q5Complete} as="h2" className="text-3xl font-bold text-center">Self-Driving Complete!</ReadableText>
         <div className="flex gap-6 text-lg">
           <span>🦸 Saves: {saves}/{totalWrong}</span>
           <span>😅 Oops: {crashes}</span>
         </div>
-        <p className="text-lg text-center max-w-md opacity-80">
+        <ReadableText voice={VOICE.q5Lesson} as="p" className="text-lg text-center max-w-md opacity-80">
           Even smart AI makes mistakes! That&apos;s why self-driving cars still need
           a human paying attention. You were the safety driver!
-        </p>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); sfxCelebrate(); speak(VOICE.q5Done).then(onComplete); }}>
+        </ReadableText>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); sfxCelebrate(); stopSpeaking(); speak(VOICE.q5Done).then(onComplete); }}>
           🏠 Back to Menu
         </button>
       </div>
@@ -102,14 +106,13 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
-      <h2 className="text-3xl font-bold">🤖 Quest 5: Self-Driving!</h2>
-      <p className="opacity-70 text-center max-w-md text-sm">
+      <ReadableText voice={VOICE.q5Title} as="h2" className="text-3xl font-bold">🤖 Quest 5: Self-Driving!</ReadableText>
+      <ReadableText voice={VOICE.q5Desc} as="p" className="opacity-70 text-center max-w-md text-sm">
         The car drives itself now! Watch for AI mistakes and hit OVERRIDE to help!
-      </p>
+      </ReadableText>
 
       <div className="text-sm opacity-70">{idx + 1} / {events.length}</div>
 
-      {/* Road */}
       <div className="w-full max-w-lg h-28 bg-gray-800 rounded-2xl relative overflow-hidden">
         <div className="absolute bottom-0 w-full h-1 bg-gray-600" />
         <div className="text-5xl absolute bottom-3 transition-all car" style={{ left: `${carPos}%`, transitionDuration: "0.15s" }}>🛻</div>
@@ -119,7 +122,6 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
         )}
       </div>
 
-      {/* AI reasoning — visible during event */}
       {phase === "event" && !overridden && !aiActed && (
         <div className="rounded-xl p-3 text-sm max-w-xs" style={{ background: "rgba(255,255,255,0.05)" }}>
           <div className="text-xs opacity-50 mb-1">🤖 AI sees:</div>
@@ -137,7 +139,6 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
         </div>
       )}
 
-      {/* Urgency bar */}
       {phase === "event" && aiWrong && !overridden && !aiActed && (
         <div className="w-full max-w-lg">
           <div className="text-sm text-center mb-1" style={{ color: "var(--warn)" }}>⚠️ Override before the AI acts!</div>

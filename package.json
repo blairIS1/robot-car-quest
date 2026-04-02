@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "voices": "./generate-voices.sh"
   },
   "keywords": [],
   "author": "",

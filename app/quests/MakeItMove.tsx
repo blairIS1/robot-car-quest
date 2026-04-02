@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import CarBuddy from "./CarBuddy";
+import ReadableText from "./ReadableText";
 import { sfxEngine, sfxBrake, sfxTap, sfxCelebrate } from "./sfx";
-import { speak, VOICE } from "./speak";
+import { speak, stopSpeaking, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
@@ -11,7 +12,10 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
   const [braking, setBraking] = useState(false);
   const [learned, setLearned] = useState({ drove: false, regen: false });
 
-  useEffect(() => { speak(VOICE.q2Start); }, []);
+  useEffect(() => {
+    speak(VOICE.q2Start);
+    return () => stopSpeaking();
+  }, []);
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -39,12 +43,12 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
       <Confetti active={done} />
-      <h2 className="text-3xl font-bold">🔄 Quest 2: Make It Move!</h2>
+      <ReadableText voice={VOICE.q2Title} as="h2" className="text-3xl font-bold">🔄 Quest 2: Make It Move!</ReadableText>
       <CarBuddy mood={mood} size={100} />
-      <p className="opacity-70 text-center max-w-md text-sm">
+      <ReadableText voice={VOICE.q2Desc} as="p" className="opacity-70 text-center max-w-md text-sm">
         An electric motor spins to move the car. When you brake, the motor runs
         backwards and charges the battery! This is called <b>regenerative braking</b>.
-      </p>
+      </ReadableText>
 
       <div className="w-full max-w-lg h-24 bg-gray-800 rounded-2xl relative overflow-hidden flex items-end">
         <div className="absolute bottom-0 w-full h-1 bg-gray-600" />
@@ -78,7 +82,7 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
         <span>{learned.regen ? "✅" : "⬜"} Regen brake</span>
       </div>
 
-      {done && <button className="btn btn-success mt-2 fade-in" onClick={() => { sfxTap(); speak(VOICE.q2Done).then(onComplete); }}>Next Quest →</button>}
+      {done && <button className="btn btn-success mt-2 fade-in" onClick={() => { sfxTap(); stopSpeaking(); speak(VOICE.q2Done).then(onComplete); }}>Next Quest →</button>}
     </div>
   );
 }

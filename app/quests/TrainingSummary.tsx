@@ -2,8 +2,9 @@
 import { useEffect } from "react";
 import { CATEGORIES, TrainingData, getConfidence } from "./data";
 import CarBuddy from "./CarBuddy";
+import ReadableText from "./ReadableText";
 import { sfxTap } from "./sfx";
-import { speak, VOICE } from "./speak";
+import { speak, stopSpeaking, VOICE } from "./speak";
 
 const CAT_EMOJI: Record<string, string> = { lights: "🚦", signs: "🛑", people: "🚶", animals: "🐕", obstacles: "🚧" };
 
@@ -11,24 +12,22 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
   const total = Object.values(training).reduce((a, b) => a + b, 0);
   const missing = CATEGORIES.filter((c) => !training[c]);
 
-  // Bias: one category has >50% of data
   const maxCat = CATEGORIES.reduce((a, b) => ((training[a] || 0) > (training[b] || 0) ? a : b));
   const maxCount = training[maxCat] || 0;
   const isBiased = total > 0 && maxCount / total > 0.5;
 
   useEffect(() => {
-    speak(VOICE.summary).then(() => {
-      if (isBiased) speak(VOICE.summaryBias);
-    });
+    speak(VOICE.summary).then(() => { if (isBiased) speak(VOICE.summaryBias); });
+    return () => stopSpeaking();
   }, [isBiased]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <CarBuddy mood="thinking" size={100} />
-      <h2 className="text-3xl font-bold">Car&apos;s AI Brain</h2>
-      <p className="text-lg opacity-80 text-center max-w-md">
+      <ReadableText voice={VOICE.summaryTitle} as="h2" className="text-3xl font-bold">Car&apos;s AI Brain</ReadableText>
+      <ReadableText voice={VOICE.summaryDesc} as="p" className="text-lg opacity-80 text-center max-w-md">
         You fed the AI <b>{total}</b> correct examples. Here&apos;s what it knows:
-      </p>
+      </ReadableText>
 
       <div className="flex flex-col gap-3 w-72">
         {CATEGORIES.map((cat) => {
@@ -77,7 +76,7 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
         </p>
       )}
 
-      <button className="btn btn-success mt-4" onClick={() => { sfxTap(); onComplete(); }}>
+      <button className="btn btn-success mt-4" onClick={() => { sfxTap(); stopSpeaking(); onComplete(); }}>
         Test Drive →
       </button>
     </div>

@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import CarBuddy from "./CarBuddy";
+import ReadableText from "./ReadableText";
 import { sfxTap, sfxCorrect, sfxWrong } from "./sfx";
-import { speak, VOICE } from "./speak";
+import { speak, stopSpeaking, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function PowerUp({ onComplete }: { onComplete: () => void }) {
@@ -11,7 +12,10 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
   const max = 7;
   const status = batteries === 0 ? "empty" : batteries < ideal ? "low" : batteries === ideal ? "perfect" : batteries <= max ? "heavy" : "overload";
 
-  useEffect(() => { speak(VOICE.q1Start); }, []);
+  useEffect(() => {
+    speak(VOICE.q1Start);
+    return () => stopSpeaking();
+  }, []);
 
   const msg: Record<string, string> = {
     empty: "Tap the batteries to add them to your car! 🔋",
@@ -26,15 +30,14 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
       <Confetti active={status === "perfect"} />
-      <h2 className="text-3xl font-bold">⚡ Quest 1: Power Up!</h2>
-      <p className="opacity-70 text-center max-w-md">
+      <ReadableText voice={VOICE.q1Title} as="h2" className="text-3xl font-bold">⚡ Quest 1: Power Up!</ReadableText>
+      <ReadableText voice={VOICE.q1Desc} as="p" className="opacity-70 text-center max-w-md">
         Electric cars have a big battery under the floor. Too few batteries = car stops halfway.
         Too many = car is too heavy! Find the right number.
-      </p>
+      </ReadableText>
 
       <CarBuddy mood={mood} size={120} />
 
-      {/* Battery bar */}
       <div className="w-64">
         <div className="progress-track">
           <div className="progress-fill" style={{
@@ -59,7 +62,7 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
       </div>
 
       {status === "perfect" && (
-        <button className="btn btn-success mt-4 fade-in" onClick={() => { sfxTap(); onComplete(); }}>Next Quest →</button>
+        <button className="btn btn-success mt-4 fade-in" onClick={() => { sfxTap(); stopSpeaking(); onComplete(); }}>Next Quest →</button>
       )}
     </div>
   );

@@ -8,20 +8,20 @@ import TestDrive from "./quests/TestDrive";
 import SelfDriving from "./quests/SelfDriving";
 import CarBuddy from "./quests/CarBuddy";
 import Confetti from "./quests/Confetti";
+import ReadableText from "./quests/ReadableText";
 import SessionTimer, { useSessionTimer } from "./quests/SessionTimer";
 import { sfxTap, sfxCelebrate } from "./quests/sfx";
-import { speak, VOICE } from "./quests/speak";
+import { speak, stopSpeaking, VOICE } from "./quests/speak";
 import { startMusic, stopMusic } from "./quests/music";
 import { recordCompletion, getCompletions } from "./quests/scores";
 import { TrainingData } from "./quests/data";
 
-// #5 — Parts collection: each quest unlocks a car part
 const PARTS = [
-  { emoji: "🔋", label: "Battery", quest: 0 },
-  { emoji: "⚙️", label: "Motor", quest: 1 },
-  { emoji: "👁️", label: "Cameras", quest: 2 },
-  { emoji: "🧠", label: "AI Brain", quest: 3 },
-  { emoji: "🤖", label: "Self-Drive", quest: 4 },
+  { emoji: "🔋", label: "Battery", quest: 0, voice: VOICE.partBattery },
+  { emoji: "⚙️", label: "Motor", quest: 1, voice: VOICE.partMotor },
+  { emoji: "👁️", label: "Cameras", quest: 2, voice: VOICE.partCameras },
+  { emoji: "🧠", label: "AI Brain", quest: 3, voice: VOICE.partAiBrain },
+  { emoji: "🤖", label: "Self-Drive", quest: 4, voice: VOICE.partSelfDrive },
 ];
 
 const QUESTS = ["⚡ Power Up", "🔄 Make It Move", "👁️ Teach It to See", "🛻 Test Drive", "🤖 Self-Driving"];
@@ -44,6 +44,7 @@ export default function Home() {
 
   const startQuest = (questPhase: Phase) => {
     sfxTap();
+    stopSpeaking();
     if (!welcomed) {
       setWelcomed(true);
       startMusic();
@@ -53,7 +54,6 @@ export default function Home() {
     }
   };
 
-  // #4 — Session timer: gentle stop after 12 min
   if (expired) {
     stopMusic();
     return <SessionTimer onDismiss={dismiss} />;
@@ -66,21 +66,26 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={completed.every(Boolean)} />
         <CarBuddy mood={completed.every(Boolean) ? "celebrate" : "idle"} size={140} />
-        <h1 className="text-4xl font-bold text-center">Build a Robot Car!</h1>
-        <p className="text-lg text-center opacity-70 max-w-md">
+        <ReadableText voice={VOICE.menuTitle} as="h1" className="text-4xl font-bold text-center">
+          Build a Robot Car!
+        </ReadableText>
+        <ReadableText voice={VOICE.menuSubtitle} as="p" className="text-lg text-center opacity-70 max-w-md">
           Collect all 5 parts to build your self-driving car!
-        </p>
+        </ReadableText>
 
-        {/* #5 — Parts collection tracker */}
         <div className="flex gap-3">
           {PARTS.map((part, i) => (
-            <div key={i} className="flex flex-col items-center gap-1" style={{ opacity: completed[part.quest] ? 1 : 0.3 }}>
+            <div key={i} className="flex flex-col items-center gap-1 readable-text"
+              style={{ opacity: completed[part.quest] ? 1 : 0.3, cursor: "pointer" }}
+              onClick={() => { sfxTap(); speak(part.voice); }}>
               <span className="text-3xl" style={{ filter: completed[part.quest] ? "none" : "grayscale(1)" }}>{part.emoji}</span>
-              <span className="text-xs">{part.label}</span>
+              <span className="text-xs">{part.label} <span className="read-icon">🔊</span></span>
             </div>
           ))}
         </div>
-        <div className="text-sm opacity-60">{partsCollected}/5 parts collected</div>
+        <ReadableText voice={VOICE.menuParts} as="div" className="text-sm opacity-60">
+          {partsCollected}/5 parts collected
+        </ReadableText>
 
         {completions > 0 && <p className="text-xs opacity-40">🏆 Completed {completions} time{completions > 1 ? "s" : ""}</p>}
 
@@ -100,9 +105,9 @@ export default function Home() {
         </div>
 
         {completed.every(Boolean) && (
-          <div className="text-xl font-bold text-center fade-in" style={{ color: "var(--success)" }}>
+          <ReadableText voice={VOICE.menuAllDone} as="div" className="text-xl font-bold text-center fade-in" style={{ color: "var(--success)" }}>
             🎉 All parts collected! Your robot car is complete!
-          </div>
+          </ReadableText>
         )}
       </div>
     );

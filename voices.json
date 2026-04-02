@@ -1,0 +1,60 @@
+{
+  "welcome": "Hi! I'm your robot car! Let's learn how self-driving cars work!",
+
+  "menu_title": "Build a Robot Car!",
+  "menu_subtitle": "Collect all 5 parts to build your self-driving car!",
+  "menu_parts": "parts collected",
+  "menu_all_done": "All parts collected! Your robot car is complete!",
+
+  "q1_start": "Quest 1! Electric cars need batteries. Too few and the car stops. Too many and it's too heavy! Find the right number.",
+  "q1_title": "Quest 1: Power Up!",
+  "q1_desc": "Electric cars have a big battery under the floor. Too few batteries means the car stops halfway. Too many means the car is too heavy! Find the right number.",
+  "q1_perfect": "Perfect! That's just the right amount of batteries!",
+  "q1_too_many": "Whoa, too many batteries! The car is way too heavy!",
+
+  "q2_start": "Quest 2! An electric motor spins to move the car. When you brake, the motor runs backwards and charges the battery! Try it!",
+  "q2_title": "Quest 2: Make It Move!",
+  "q2_desc": "An electric motor spins to move the car. When you brake, the motor runs backwards and charges the battery! This is called regenerative braking.",
+  "q2_fast": "Wow, you're going fast! Watch the battery drain!",
+  "q2_regen": "Amazing! You discovered regenerative braking! The battery is charging!",
+  "q2_done": "Great job! You learned how electric motors and regenerative braking work!",
+
+  "q3_start": "Quest 3! The car has cameras but its AI brain needs to learn. Look at each picture and tell the car: should it stop or go?",
+  "q3_title": "Quest 3: Teach It to See!",
+  "q3_desc": "The car has cameras but its AI brain needs to learn. Should the car stop or go?",
+  "q3_correct": "Got it! Great job teaching the car!",
+  "q3_wrong": "Oops! Let's try to remember that one!",
+  "q3_done": "Training complete! Let's see how smart the car is now!",
+
+  "summary": "Here's what the car learned from your training data!",
+  "summary_title": "Car's AI Brain",
+  "summary_desc": "You fed the AI correct examples. Here's what it knows.",
+  "summary_bias": "Warning! Most of the training data is about one category. The car might struggle with other situations!",
+
+  "q4_start": "Quest 4! Your car is on the road. See what the AI thinks, then you decide: stop or go!",
+  "q4_title": "Quest 4: Test Drive!",
+  "q4_desc": "Your car is on the road! See what the AI thinks, then decide.",
+  "q4_correct": "Nice call! You and the AI agree!",
+  "q4_wrong": "Oops! The AI got confused. It still needs more training!",
+  "q4_retrain": "The car made too many mistakes. Let's go back and train it more!",
+
+  "q5_start": "Quest 5! The car drives itself now! Watch for AI mistakes and hit override to help!",
+  "q5_title": "Quest 5: Self-Driving!",
+  "q5_desc": "The car drives itself now! Watch for AI mistakes and hit override to help!",
+  "q5_save": "Great save! You caught the AI's mistake!",
+  "q5_crash": "Oops! The AI made a wrong choice!",
+  "q5_ai_right": "The AI got it right this time!",
+  "q5_done": "Amazing! Even smart AI makes mistakes. That's why self-driving cars still need a human paying attention!",
+  "q5_complete": "Self-Driving Complete!",
+  "q5_lesson": "Even smart AI makes mistakes! That's why self-driving cars still need a human paying attention. You were the safety driver!",
+
+  "all_done": "You did it! You built a whole self-driving car! Come back anytime to play again!",
+
+  "part_battery": "Battery",
+  "part_motor": "Motor",
+  "part_cameras": "Cameras",
+  "part_ai_brain": "AI Brain",
+  "part_self_drive": "Self-Drive",
+
+  "next_quest": "Next Quest!"
+}

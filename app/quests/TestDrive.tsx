@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { TrainingData, generateTestScenes } from "./data";
 import CarBuddy from "./CarBuddy";
+import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
-import { speak, VOICE } from "./speak";
+import { speak, stopSpeaking, VOICE } from "./speak";
 import Confetti from "./Confetti";
 
 export default function TestDrive({ training, onComplete }: { training: TrainingData; onComplete: (needsRetrain: boolean) => void }) {
@@ -16,7 +17,10 @@ export default function TestDrive({ training, onComplete }: { training: Training
   const [done, setDone] = useState(false);
   const [carPos, setCarPos] = useState(10);
 
-  useEffect(() => { speak(VOICE.q4Start); }, []);
+  useEffect(() => {
+    speak(VOICE.q4Start);
+    return () => stopSpeaking();
+  }, []);
 
   const scene = scenes[idx];
 
@@ -52,15 +56,15 @@ export default function TestDrive({ training, onComplete }: { training: Training
         </p>
         {needsRetrain ? (
           <div className="flex gap-3 mt-4">
-            <button className="btn" style={{ background: "var(--accent)", color: "#0f172a" }} onClick={() => onComplete(true)}>
+            <button className="btn" style={{ background: "var(--accent)", color: "#0f172a" }} onClick={() => { stopSpeaking(); onComplete(true); }}>
               🔄 Retrain AI
             </button>
-            <button className="btn" style={{ background: "var(--card)" }} onClick={() => onComplete(false)}>
+            <button className="btn" style={{ background: "var(--card)" }} onClick={() => { stopSpeaking(); onComplete(false); }}>
               Continue anyway →
             </button>
           </div>
         ) : (
-          <button className="btn btn-success mt-4" onClick={() => onComplete(false)}>
+          <button className="btn btn-success mt-4" onClick={() => { stopSpeaking(); onComplete(false); }}>
             Next Quest →
           </button>
         )}
@@ -68,21 +72,19 @@ export default function TestDrive({ training, onComplete }: { training: Training
     );
   }
 
-  // AI's reasoning for this scene
   const confColor = scene.confidence >= 70 ? "#4ade80" : scene.confidence >= 45 ? "#fbbf24" : "#ef4444";
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <Confetti active={showConfetti} />
-      <h2 className="text-3xl font-bold">🛻 Quest 4: Test Drive!</h2>
+      <ReadableText voice={VOICE.q4Title} as="h2" className="text-3xl font-bold">🛻 Quest 4: Test Drive!</ReadableText>
       <CarBuddy mood={mood} size={80} />
-      <p className="opacity-70 text-center max-w-md text-sm">
+      <ReadableText voice={VOICE.q4Desc} as="p" className="opacity-70 text-center max-w-md text-sm">
         Your car is on the road! See what the AI thinks, then decide.
-      </p>
+      </ReadableText>
 
       <div className="text-sm opacity-70">{idx + 1} / {scenes.length}</div>
 
-      {/* Road */}
       <div className="w-full max-w-lg h-28 bg-gray-800 rounded-2xl relative overflow-hidden">
         <div className="absolute bottom-0 w-full h-1 bg-gray-600" />
         <div className="text-5xl absolute bottom-3 transition-all car" style={{ left: `${carPos}%`, transitionDuration: "0.15s" }}>🛻</div>
@@ -91,7 +93,6 @@ export default function TestDrive({ training, onComplete }: { training: Training
 
       <div className="text-xl font-semibold">{scene.label}</div>
 
-      {/* AI reasoning */}
       <div className="rounded-xl p-3 text-sm max-w-xs" style={{ background: "rgba(255,255,255,0.05)" }}>
         <div className="text-xs opacity-50 mb-1">🤖 AI sees:</div>
         <div className="flex flex-wrap gap-1">
@@ -107,7 +108,6 @@ export default function TestDrive({ training, onComplete }: { training: Training
         </div>
       </div>
 
-      {/* Confidence bar */}
       <div className="flex items-center gap-2 w-48">
         <span className="text-xs opacity-60 w-20">Confidence:</span>
         <div className="progress-track flex-1">
