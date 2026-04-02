@@ -2,9 +2,11 @@
 
 const BASE = "/robot-car-quest/audio/";
 let current: HTMLAudioElement | null = null;
+let queue: Promise<void> = Promise.resolve();
 
 export function speak(key: string): Promise<void> {
-  return new Promise((resolve) => {
+  // Queue audio so lines don't overlap
+  queue = queue.then(() => new Promise<void>((resolve) => {
     if (typeof window === "undefined") { resolve(); return; }
     if (current) { current.pause(); current = null; }
     const a = new Audio(BASE + key);
@@ -12,10 +14,10 @@ export function speak(key: string): Promise<void> {
     a.onended = () => { current = null; resolve(); };
     a.onerror = () => { current = null; resolve(); };
     a.play().catch(() => resolve());
-  });
+  }));
+  return queue;
 }
 
-// Voice line MP3 keys
 export const VOICE = {
   welcome: "welcome.mp3",
   q1Start: "q1_start.mp3",

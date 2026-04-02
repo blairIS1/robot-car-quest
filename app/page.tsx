@@ -22,11 +22,23 @@ export default function Home() {
   const [completed, setCompleted] = useState<boolean[]>([false, false, false, false, false]);
   const [training, setTraining] = useState<TrainingData>({});
   const [completions, setCompletions] = useState(0);
+  const [welcomed, setWelcomed] = useState(false);
 
-  useEffect(() => { setCompletions(getCompletions()); speak(VOICE.welcome); }, []);
+  useEffect(() => { setCompletions(getCompletions()); }, []);
 
   const markDone = (idx: number) => {
     setCompleted((prev) => { const n = [...prev]; n[idx] = true; return n; });
+  };
+
+  // Play welcome on first tap (needs user interaction for audio)
+  const startQuest = (questPhase: Phase) => {
+    sfxTap();
+    if (!welcomed) {
+      setWelcomed(true);
+      speak(VOICE.welcome).then(() => setPhase(questPhase));
+    } else {
+      setPhase(questPhase);
+    }
   };
 
   if (phase === "menu") {
@@ -47,7 +59,7 @@ export default function Home() {
               className="btn btn-primary flex justify-between items-center"
               style={{ opacity: i === 0 || completed[i - 1] ? 1 : 0.4 }}
               disabled={i > 0 && !completed[i - 1]}
-              onClick={() => { sfxTap(); setPhase(questPhases[i]); }}
+              onClick={() => startQuest(questPhases[i])}
             >
               <span>{name}</span>
               {completed[i] && <span>✅</span>}
