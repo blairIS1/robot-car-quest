@@ -3,7 +3,7 @@
 // Car buddy — a car with eyes and expressions, like Robi in animal-sorter
 type Mood = "idle" | "happy" | "thinking" | "scared" | "celebrate";
 
-export default function CarBuddy({ mood = "idle", size = 100 }: { mood?: Mood; size?: number }) {
+export default function CarBuddy({ mood = "idle", size = 100, talking = false }: { mood?: Mood; size?: number; talking?: boolean }) {
   const w = size;
   const h = size * 0.65;
 
@@ -18,7 +18,7 @@ export default function CarBuddy({ mood = "idle", size = 100 }: { mood?: Mood; s
   const bodyAnim = mood === "celebrate" ? "bounce 0.5s ease-in-out infinite" : mood === "happy" ? "wiggle 0.6s ease-in-out" : "none";
 
   return (
-    <svg width={w} height={h} viewBox="0 0 90 58" fill="none">
+    <svg width={w} height={h} viewBox="0 0 95 58" fill="none">
       <style>{`
         @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
         @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
@@ -74,6 +74,18 @@ export default function CarBuddy({ mood = "idle", size = 100 }: { mood?: Mood; s
       {mood === "celebrate" && <>
         <text x="2" y="10" fontSize="10">✨</text>
         <text x="74" y="8" fontSize="10">✨</text>
+      </>}
+      {/* Talking indicator — animated speech dots */}
+      {talking && <>
+        <circle cx="78" cy="4" r="2" fill="#38bdf8">
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="0.6s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="84" cy="2" r="2.5" fill="#38bdf8">
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="0.6s" begin="0.2s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="90" cy="4" r="2" fill="#38bdf8">
+          <animate attributeName="opacity" values="0.3;1;0.3" dur="0.6s" begin="0.4s" repeatCount="indefinite" />
+        </circle>
       </>}
     </svg>
   );

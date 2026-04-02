@@ -68,6 +68,7 @@ body {
 }
 .btn:hover { transform: scale(1.05); }
 .btn:active { animation: btn-squash 0.2s ease; }
+.btn:disabled { opacity: 0.5; pointer-events: none; }
 
 @keyframes btn-squash {
   0% { transform: scale(1); }

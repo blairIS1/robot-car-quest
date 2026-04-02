@@ -5,12 +5,13 @@ import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxTap } from "./sfx";
 import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile } from "./useMobile";
+import { useMobile, useSpeaking } from "./useMobile";
 
 const CAT_EMOJI: Record<string, string> = { lights: "🚦", signs: "🛑", people: "🚶", animals: "🐕", obstacles: "🚧" };
 
 export default function TrainingSummary({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
   const mobile = useMobile();
+  const talking = useSpeaking();
   const total = Object.values(training).reduce((a, b) => a + b, 0);
   const missing = CATEGORIES.filter((c) => !training[c]);
 
@@ -25,7 +26,7 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
-      <CarBuddy mood="thinking" size={mobile ? 70 : 100} />
+      <CarBuddy mood="thinking" size={mobile ? 70 : 100} talking={talking} />
       <ReadableText voice={VOICE.summaryTitle} as="h2" className="text-3xl font-bold">Car&apos;s AI Brain</ReadableText>
       <ReadableText voice={VOICE.summaryDesc} as="p" className="text-lg opacity-80 text-center max-w-md">
         You fed the AI <b>{total}</b> correct examples. Here&apos;s what it knows:
@@ -78,7 +79,7 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
         </p>
       )}
 
-      <button className="btn btn-success mt-4" onClick={() => { sfxTap(); stopSpeaking(); onComplete(); }}>
+      <button className="btn btn-success mt-4" disabled={talking} onClick={() => { sfxTap(); stopSpeaking(); onComplete(); }}>
         Test Drive →
       </button>
     </div>

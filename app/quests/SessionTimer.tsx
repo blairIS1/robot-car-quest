@@ -1,15 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
 import CarBuddy from "./CarBuddy";
-import { useMobile } from "./useMobile";
+import { useMobile, useSpeaking } from "./useMobile";
 
 const SESSION_LIMIT = 12 * 60;
 
 export default function SessionTimer({ onDismiss }: { onDismiss: () => void }) {
   const mobile = useMobile();
+  const talking = useSpeaking();
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
-      <CarBuddy mood="happy" size={mobile ? 90 : 140} />
+      <CarBuddy mood="happy" size={mobile ? 90 : 140} talking={talking} />
       <h2 className="text-3xl font-bold text-center">⏰ Great job today!</h2>
       <p className="text-lg opacity-80 text-center max-w-md">
         You&apos;ve been playing for 12 minutes — your brain needs a break to remember everything you learned!

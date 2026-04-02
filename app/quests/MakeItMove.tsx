@@ -4,12 +4,13 @@ import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxEngine, sfxBrake, sfxTap, sfxCelebrate } from "./sfx";
 import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile } from "./useMobile";
+import { useMobile, useSpeaking } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
   const [speed, setSpeed] = useState(0);
   const mobile = useMobile();
+  const talking = useSpeaking();
   const [battery, setBattery] = useState(80);
   const [braking, setBraking] = useState(false);
   const [learned, setLearned] = useState({ drove: false, regen: false });
@@ -46,7 +47,7 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
       <Confetti active={done} />
       <ReadableText voice={VOICE.q2Title} as="h2" className="text-3xl font-bold">🔄 Quest 2: Make It Move!</ReadableText>
-      <CarBuddy mood={mood} size={mobile ? 70 : 100} />
+      <CarBuddy mood={mood} size={mobile ? 70 : 100} talking={talking} />
       <ReadableText voice={VOICE.q2Desc} as="p" className="opacity-70 text-center max-w-md text-sm">
         An electric motor spins to move the car. When you brake, the motor runs
         backwards and charges the battery! This is called <b>regenerative braking</b>.
@@ -84,7 +85,7 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
         <span>{learned.regen ? "✅" : "⬜"} Regen brake</span>
       </div>
 
-      {done && <button className="btn btn-success mt-2 fade-in" onClick={() => { sfxTap(); stopSpeaking(); onComplete(); }}>Next Quest →</button>}
+      {done && <button className="btn btn-success mt-2 fade-in" disabled={talking} onClick={() => { sfxTap(); stopSpeaking(); onComplete(); }}>Next Quest →</button>}
     </div>
   );
 }

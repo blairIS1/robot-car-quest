@@ -5,12 +5,13 @@ import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap, sfxBrake, sfxCelebrate } from "./sfx";
 import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile } from "./useMobile";
+import { useMobile, useSpeaking } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function SelfDriving({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
   const [events] = useState(() => generateSelfDrivingEvents(training));
   const mobile = useMobile();
+  const talking = useSpeaking();
   const [idx, setIdx] = useState(0);
   const [carPos, setCarPos] = useState(10);
   const [phase, setPhase] = useState<"driving" | "event" | "result">("driving");
@@ -85,7 +86,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={true} />
-        <CarBuddy mood="celebrate" size={mobile ? 90 : 140} />
+        <CarBuddy mood="celebrate" size={mobile ? 90 : 140} talking={talking} />
         <ReadableText voice={VOICE.q5Complete} as="h2" className="text-3xl font-bold text-center">Self-Driving Complete!</ReadableText>
         <div className="flex gap-6 text-lg">
           <span>🦸 Saves: {saves}/{totalWrong}</span>
@@ -95,7 +96,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
           Even smart AI makes mistakes! That&apos;s why self-driving cars still need
           a human paying attention. You were the safety driver!
         </ReadableText>
-        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); sfxCelebrate(); stopSpeaking(); onComplete(); }}>
+        <button className="btn btn-success mt-4" disabled={talking} onClick={() => { sfxTap(); sfxCelebrate(); stopSpeaking(); onComplete(); }}>
           🏠 Back to Menu
         </button>
       </div>

@@ -4,9 +4,23 @@ const BASE = "/robot-car-quest/audio/";
 let current: HTMLAudioElement | null = null;
 let queue: Promise<void> = Promise.resolve();
 let cancelId = 0;
+let speaking = false;
+const listeners = new Set<(v: boolean) => void>();
+
+function setSpeaking(v: boolean) {
+  if (speaking === v) return;
+  speaking = v;
+  listeners.forEach((fn) => fn(v));
+}
+
+export function onSpeakingChange(fn: (v: boolean) => void) {
+  listeners.add(fn);
+  return () => { listeners.delete(fn); };
+}
 
 export function speak(key: string): Promise<void> {
   const id = cancelId;
+  setSpeaking(true);
   queue = queue.then(() => new Promise<void>((resolve) => {
     if (id !== cancelId) { resolve(); return; }
     if (typeof window === "undefined") { resolve(); return; }
@@ -16,18 +30,19 @@ export function speak(key: string): Promise<void> {
     a.onended = () => { current = null; resolve(); };
     a.onerror = () => { current = null; resolve(); };
     a.play().catch(() => resolve());
-  }));
+  })).then(() => {
+    if (cancelId === id) setSpeaking(false);
+  });
   return queue;
 }
 
-/** Cancel current audio and flush the queue. Call in useEffect cleanup or before navigation. */
 export function stopSpeaking() {
   cancelId++;
   if (current) { current.pause(); current = null; }
   queue = Promise.resolve();
+  setSpeaking(false);
 }
 
-// Auto-generated from voices.json — run: ./generate-voices.sh && update this map
 export const VOICE = {
   welcome: "welcome.mp3",
   menuTitle: "menu_title.mp3",

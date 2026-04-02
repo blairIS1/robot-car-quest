@@ -4,12 +4,13 @@ import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxTap, sfxCorrect, sfxWrong } from "./sfx";
 import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile } from "./useMobile";
+import { useMobile, useSpeaking } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function PowerUp({ onComplete }: { onComplete: () => void }) {
   const [batteries, setBatteries] = useState(0);
   const mobile = useMobile();
+  const talking = useSpeaking();
   const ideal = 4;
   const max = 7;
   const status = batteries === 0 ? "empty" : batteries < ideal ? "low" : batteries === ideal ? "perfect" : batteries <= max ? "heavy" : "overload";
@@ -38,7 +39,7 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
         Too many = car is too heavy! Find the right number.
       </ReadableText>
 
-      <CarBuddy mood={mood} size={mobile ? 80 : 120} />
+      <CarBuddy mood={mood} size={mobile ? 80 : 120} talking={talking} />
 
       <div className="w-full max-w-64">
         <div className="progress-track">
@@ -64,7 +65,7 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
       </div>
 
       {status === "perfect" && (
-        <button className="btn btn-success mt-4 fade-in" onClick={() => { sfxTap(); stopSpeaking(); onComplete(); }}>Next Quest →</button>
+        <button className="btn btn-success mt-4 fade-in" disabled={talking} onClick={() => { sfxTap(); stopSpeaking(); onComplete(); }}>Next Quest →</button>
       )}
     </div>
   );

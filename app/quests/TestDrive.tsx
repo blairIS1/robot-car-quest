@@ -5,12 +5,13 @@ import CarBuddy from "./CarBuddy";
 import ReadableText from "./ReadableText";
 import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
 import { speak, stopSpeaking, VOICE } from "./speak";
-import { useMobile } from "./useMobile";
+import { useMobile, useSpeaking } from "./useMobile";
 import Confetti from "./Confetti";
 
 export default function TestDrive({ training, onComplete }: { training: TrainingData; onComplete: (needsRetrain: boolean) => void }) {
   const [scenes] = useState(() => generateTestScenes(training));
   const mobile = useMobile();
+  const talking = useSpeaking();
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [mistakes, setMistakes] = useState(0);
@@ -50,7 +51,7 @@ export default function TestDrive({ training, onComplete }: { training: Training
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={!needsRetrain} />
-        <CarBuddy mood={needsRetrain ? "scared" : "celebrate"} size={mobile ? 80 : 120} />
+        <CarBuddy mood={needsRetrain ? "scared" : "celebrate"} size={mobile ? 80 : 120} talking={talking} />
         <h2 className="text-3xl font-bold text-center">Test Drive Complete!</h2>
         <p className="text-lg text-center max-w-md opacity-80">
           {mistakes === 0 ? "Perfect driving! The AI training paid off!" :
@@ -58,15 +59,15 @@ export default function TestDrive({ training, onComplete }: { training: Training
         </p>
         {needsRetrain ? (
           <div className="flex gap-3 mt-4">
-            <button className="btn" style={{ background: "var(--accent)", color: "#0f172a" }} onClick={() => { stopSpeaking(); onComplete(true); }}>
+            <button className="btn" style={{ background: "var(--accent)", color: "#0f172a" }} disabled={talking} onClick={() => { stopSpeaking(); onComplete(true); }}>
               🔄 Retrain AI
             </button>
-            <button className="btn" style={{ background: "var(--card)" }} onClick={() => { stopSpeaking(); onComplete(false); }}>
+            <button className="btn" style={{ background: "var(--card)" }} disabled={talking} onClick={() => { stopSpeaking(); onComplete(false); }}>
               Continue anyway →
             </button>
           </div>
         ) : (
-          <button className="btn btn-success mt-4" onClick={() => { stopSpeaking(); onComplete(false); }}>
+          <button className="btn btn-success mt-4" disabled={talking} onClick={() => { stopSpeaking(); onComplete(false); }}>
             Next Quest →
           </button>
         )}
@@ -80,7 +81,7 @@ export default function TestDrive({ training, onComplete }: { training: Training
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
       <Confetti active={showConfetti} />
       <ReadableText voice={VOICE.q4Title} as="h2" className="text-3xl font-bold">🛻 Quest 4: Test Drive!</ReadableText>
-      <CarBuddy mood={mood} size={mobile ? 60 : 80} />
+      <CarBuddy mood={mood} size={mobile ? 60 : 80} talking={talking} />
       <ReadableText voice={VOICE.q4Desc} as="p" className="opacity-70 text-center max-w-md text-sm">
         Your car is on the road! See what the AI thinks, then decide.
       </ReadableText>

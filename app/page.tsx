@@ -12,7 +12,7 @@ import ReadableText from "./quests/ReadableText";
 import SessionTimer, { useSessionTimer } from "./quests/SessionTimer";
 import { sfxTap, sfxCelebrate } from "./quests/sfx";
 import { speak, stopSpeaking, VOICE } from "./quests/speak";
-import { useMobile } from "./quests/useMobile";
+import { useMobile, useSpeaking } from "./quests/useMobile";
 import { startMusic, stopMusic } from "./quests/music";
 import { recordCompletion, getCompletions } from "./quests/scores";
 import { TrainingData } from "./quests/data";
@@ -37,6 +37,7 @@ export default function Home() {
   const [started, setStarted] = useState(false);
   const { expired, dismiss } = useSessionTimer();
   const mobile = useMobile();
+  const talking = useSpeaking();
 
   useEffect(() => { setCompletions(getCompletions()); }, []);
 
@@ -61,7 +62,7 @@ export default function Home() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={completed.every(Boolean)} />
-        <CarBuddy mood={completed.every(Boolean) ? "celebrate" : "idle"} size={mobile ? 90 : 140} />
+        <CarBuddy mood={completed.every(Boolean) ? "celebrate" : "idle"} size={mobile ? 90 : 140} talking={talking} />
         <ReadableText voice={VOICE.menuTitle} as="h1" className="text-4xl font-bold text-center">
           Build a Robot Car!
         </ReadableText>
@@ -70,7 +71,7 @@ export default function Home() {
         </ReadableText>
 
         {!started ? (
-          <button className="btn btn-primary text-xl mt-4" onClick={() => {
+          <button className="btn btn-primary text-xl mt-4" disabled={talking} onClick={() => {
             sfxTap();
             setStarted(true);
             startMusic();
@@ -102,7 +103,7 @@ export default function Home() {
                   key={i}
                   className="btn btn-primary flex justify-between items-center"
                   style={{ opacity: i === 0 || completed[i - 1] ? 1 : 0.4 }}
-                  disabled={i > 0 && !completed[i - 1]}
+                  disabled={talking || (i > 0 && !completed[i - 1])}
                   onClick={() => startQuest(questPhases[i])}
                 >
                   <span>{name}</span>
