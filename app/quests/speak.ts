@@ -3,9 +3,12 @@
 const BASE = "/robot-car-quest/audio/";
 let current: HTMLAudioElement | null = null;
 let queue: Promise<void> = Promise.resolve();
+let cancelId = 0;
 
 export function speak(key: string): Promise<void> {
+  const id = cancelId;
   queue = queue.then(() => new Promise<void>((resolve) => {
+    if (id !== cancelId) { resolve(); return; }
     if (typeof window === "undefined") { resolve(); return; }
     if (current) { current.pause(); current = null; }
     const a = new Audio(BASE + key);
@@ -17,8 +20,9 @@ export function speak(key: string): Promise<void> {
   return queue;
 }
 
-/** Cancel current audio and flush the queue. Call in useEffect cleanup. */
+/** Cancel current audio and flush the queue. Call in useEffect cleanup or before navigation. */
 export function stopSpeaking() {
+  cancelId++;
   if (current) { current.pause(); current = null; }
   queue = Promise.resolve();
 }
