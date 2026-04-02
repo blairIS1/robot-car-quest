@@ -28,7 +28,7 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
       speak(VOICE.q3Correct);
     } else {
       sfxWrong(); setMood("scared");
-      setFeedback(`❌ Oops! The car should ${current.answer} for "${current.label}"`);
+      setFeedback(`Oops! The car should ${current.answer} for "${current.label}" 😅`);
       speak(VOICE.q3Wrong);
     }
     setTimeout(() => {

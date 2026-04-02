@@ -17,7 +17,8 @@ export function sfxCorrect() {
   play(523, "sine", 0.15); setTimeout(() => play(659, "sine", 0.15), 100); setTimeout(() => play(784, "sine", 0.3), 200);
 }
 export function sfxWrong() {
-  play(200, "square", 0.15, 0.15); setTimeout(() => play(150, "square", 0.3, 0.15), 150);
+  // Gentle "boop-boop" instead of harsh buzzer
+  play(350, "sine", 0.15, 0.15); setTimeout(() => play(280, "sine", 0.2, 0.12), 150);
 }
 export function sfxTap() { play(880, "sine", 0.08, 0.15); }
 export function sfxCelebrate() {

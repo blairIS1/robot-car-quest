@@ -8,10 +8,21 @@ import TestDrive from "./quests/TestDrive";
 import SelfDriving from "./quests/SelfDriving";
 import CarBuddy from "./quests/CarBuddy";
 import Confetti from "./quests/Confetti";
+import SessionTimer, { useSessionTimer } from "./quests/SessionTimer";
 import { sfxTap, sfxCelebrate } from "./quests/sfx";
 import { speak, VOICE } from "./quests/speak";
+import { startMusic, stopMusic } from "./quests/music";
 import { recordCompletion, getCompletions } from "./quests/scores";
 import { TrainingData } from "./quests/data";
+
+// #5 — Parts collection: each quest unlocks a car part
+const PARTS = [
+  { emoji: "🔋", label: "Battery", quest: 0 },
+  { emoji: "⚙️", label: "Motor", quest: 1 },
+  { emoji: "👁️", label: "Cameras", quest: 2 },
+  { emoji: "🧠", label: "AI Brain", quest: 3 },
+  { emoji: "🤖", label: "Self-Drive", quest: 4 },
+];
 
 const QUESTS = ["⚡ Power Up", "🔄 Make It Move", "👁️ Teach It to See", "🛻 Test Drive", "🤖 Self-Driving"];
 
@@ -23,6 +34,7 @@ export default function Home() {
   const [training, setTraining] = useState<TrainingData>({});
   const [completions, setCompletions] = useState(0);
   const [welcomed, setWelcomed] = useState(false);
+  const { expired, dismiss } = useSessionTimer();
 
   useEffect(() => { setCompletions(getCompletions()); }, []);
 
@@ -30,28 +42,48 @@ export default function Home() {
     setCompleted((prev) => { const n = [...prev]; n[idx] = true; return n; });
   };
 
-  // Play welcome on first tap (needs user interaction for audio)
   const startQuest = (questPhase: Phase) => {
     sfxTap();
     if (!welcomed) {
       setWelcomed(true);
+      startMusic();
       speak(VOICE.welcome).then(() => setPhase(questPhase));
     } else {
       setPhase(questPhase);
     }
   };
 
+  // #4 — Session timer: gentle stop after 12 min
+  if (expired) {
+    stopMusic();
+    return <SessionTimer onDismiss={dismiss} />;
+  }
+
   if (phase === "menu") {
     const questPhases: Phase[] = ["q1", "q2", "q3", "q4", "q5"];
+    const partsCollected = completed.filter(Boolean).length;
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-8 p-8 fade-in">
+      <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={completed.every(Boolean)} />
         <CarBuddy mood={completed.every(Boolean) ? "celebrate" : "idle"} size={140} />
         <h1 className="text-4xl font-bold text-center">Build a Robot Car!</h1>
         <p className="text-lg text-center opacity-70 max-w-md">
-          Learn how self-driving cars work by building your own robot car — step by step!
+          Collect all 5 parts to build your self-driving car!
         </p>
-        {completions > 0 && <p className="text-sm opacity-50">🏆 Quests completed: {completions} times</p>}
+
+        {/* #5 — Parts collection tracker */}
+        <div className="flex gap-3">
+          {PARTS.map((part, i) => (
+            <div key={i} className="flex flex-col items-center gap-1" style={{ opacity: completed[part.quest] ? 1 : 0.3 }}>
+              <span className="text-3xl" style={{ filter: completed[part.quest] ? "none" : "grayscale(1)" }}>{part.emoji}</span>
+              <span className="text-xs">{part.label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="text-sm opacity-60">{partsCollected}/5 parts collected</div>
+
+        {completions > 0 && <p className="text-xs opacity-40">🏆 Completed {completions} time{completions > 1 ? "s" : ""}</p>}
+
         <div className="flex flex-col gap-3 w-full max-w-sm">
           {QUESTS.map((name, i) => (
             <button
@@ -62,13 +94,14 @@ export default function Home() {
               onClick={() => startQuest(questPhases[i])}
             >
               <span>{name}</span>
-              {completed[i] && <span>✅</span>}
+              {completed[i] ? <span>✅</span> : <span className="opacity-40">{PARTS[i].emoji}</span>}
             </button>
           ))}
         </div>
+
         {completed.every(Boolean) && (
-          <div className="text-2xl font-bold text-center fade-in" style={{ color: "var(--success)" }}>
-            🎉 You built a self-driving robot car! Amazing job!
+          <div className="text-xl font-bold text-center fade-in" style={{ color: "var(--success)" }}>
+            🎉 All parts collected! Your robot car is complete!
           </div>
         )}
       </div>

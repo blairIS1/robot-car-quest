@@ -120,7 +120,7 @@ export default function TestDrive({ training, onComplete }: { training: Training
         <div className="text-lg text-center fade-in" style={{ color: picked === scene.correct ? "var(--success)" : "var(--warn)" }}>
           {picked === scene.correct
             ? `✅ Correct! The car should ${scene.correct}!`
-            : `❌ Not quite — the car should ${scene.correct}!`}
+            : `Oops! The car should ${scene.correct}! 😅`}
         </div>
       ) : (
         <div className="flex gap-4 fade-in">

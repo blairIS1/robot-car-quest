@@ -61,7 +61,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
       return { icon: "😅", text: "False alarm — the AI had it right. No harm done!", ok: true };
     }
     if (!aiWrong) return { icon: "🤖✅", text: `AI got it right! ${event.label} → ${event.aiChoice.toUpperCase()}`, ok: true };
-    return { icon: "💥", text: `Oops! The AI chose ${event.aiChoice.toUpperCase()} but should have ${event.correct.toUpperCase()}ed for "${event.label}"!`, ok: false };
+    return { icon: "😅", text: `Oops! The AI chose ${event.aiChoice.toUpperCase()} but should have ${event.correct.toUpperCase()}ed for "${event.label}"! Still learning!`, ok: false };
   };
 
   const advance = () => {
@@ -83,7 +83,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
         <h2 className="text-3xl font-bold text-center">Self-Driving Complete!</h2>
         <div className="flex gap-6 text-lg">
           <span>🦸 Saves: {saves}/{totalWrong}</span>
-          <span>💥 Crashes: {crashes}</span>
+          <span>😅 Oops: {crashes}</span>
         </div>
         <p className="text-lg text-center max-w-md opacity-80">
           Even smart AI makes mistakes! That&apos;s why self-driving cars still need
@@ -104,7 +104,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
       <h2 className="text-3xl font-bold">🤖 Quest 5: Self-Driving!</h2>
       <p className="opacity-70 text-center max-w-md text-sm">
-        The car drives itself now! Watch for AI mistakes and hit OVERRIDE before it crashes!
+        The car drives itself now! Watch for AI mistakes and hit OVERRIDE to help!
       </p>
 
       <div className="text-sm opacity-70">{idx + 1} / {events.length}</div>
@@ -169,7 +169,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
 
       <div className="flex gap-4 text-sm opacity-70">
         <span>🦸 Saves: {saves}</span>
-        <span>💥 Crashes: {crashes}</span>
+        <span>😅 Oops: {crashes}</span>
       </div>
     </div>
   );
