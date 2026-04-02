@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { TrainingData, generateSelfDrivingEvents } from "./data";
+import CarBuddy from "./CarBuddy";
+import { sfxCorrect, sfxWrong, sfxTap, sfxBrake, sfxCelebrate } from "./sfx";
+import Confetti from "./Confetti";
 
 export default function SelfDriving({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
   const [events] = useState(() => generateSelfDrivingEvents(training));
@@ -37,7 +40,8 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
 
   useEffect(() => {
     if (!aiActed || phase !== "event") return;
-    if (aiWrong) setCrashes((c) => c + 1);
+    if (aiWrong) { setCrashes((c) => c + 1); sfxWrong(); }
+    else sfxCorrect();
     setPhase("result");
   }, [aiActed, phase, aiWrong]);
 
@@ -45,7 +49,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
     if (phase !== "event" || aiActed) return;
     setOverridden(true);
     setPhase("result");
-    if (aiWrong) setSaves((s) => s + 1);
+    if (aiWrong) { setSaves((s) => s + 1); sfxBrake(); sfxCorrect(); }
   }, [phase, aiActed, aiWrong]);
 
   const getResult = () => {
@@ -71,9 +75,9 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
     const totalWrong = events.filter((e) => e.correct !== e.aiChoice).length;
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
-        <div className="text-8xl">🎉</div>
+        <Confetti active={true} />
+        <CarBuddy mood="celebrate" size={140} />
         <h2 className="text-3xl font-bold text-center">Self-Driving Complete!</h2>
-        <div className="text-6xl my-2"><span className="car">🛻</span>🤖✨</div>
         <div className="flex gap-6 text-lg">
           <span>🦸 Saves: {saves}/{totalWrong}</span>
           <span>💥 Crashes: {crashes}</span>
@@ -82,7 +86,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
           Even smart AI makes mistakes! That&apos;s why self-driving cars still need
           a human paying attention. You were the safety driver!
         </p>
-        <button className="btn btn-success mt-4" onClick={onComplete}>
+        <button className="btn btn-success mt-4" onClick={() => { sfxTap(); sfxCelebrate(); onComplete(); }}>
           🏠 Back to Menu
         </button>
       </div>

@@ -1,5 +1,7 @@
 "use client";
 import { CATEGORIES, TrainingData, getConfidence } from "./data";
+import CarBuddy from "./CarBuddy";
+import { sfxTap } from "./sfx";
 
 const CAT_EMOJI: Record<string, string> = { lights: "🚦", signs: "🛑", people: "🚶", animals: "🐕", obstacles: "🚧" };
 
@@ -14,7 +16,7 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
-      <div className="text-6xl">🧠</div>
+      <CarBuddy mood="thinking" size={100} />
       <h2 className="text-3xl font-bold">Car&apos;s AI Brain</h2>
       <p className="text-lg opacity-80 text-center max-w-md">
         You fed the AI <b>{total}</b> correct examples. Here&apos;s what it knows:
@@ -67,7 +69,7 @@ export default function TrainingSummary({ training, onComplete }: { training: Tr
         </p>
       )}
 
-      <button className="btn btn-success mt-4" onClick={onComplete}>
+      <button className="btn btn-success mt-4" onClick={() => { sfxTap(); onComplete(); }}>
         Test Drive →
       </button>
     </div>

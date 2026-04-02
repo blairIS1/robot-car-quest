@@ -1,12 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
 import { TrainingData, generateTestScenes } from "./data";
+import CarBuddy from "./CarBuddy";
+import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
+import Confetti from "./Confetti";
 
 export default function TestDrive({ training, onComplete }: { training: TrainingData; onComplete: (needsRetrain: boolean) => void }) {
   const [scenes] = useState(() => generateTestScenes(training));
   const [idx, setIdx] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [mistakes, setMistakes] = useState(0);
+  const [mood, setMood] = useState<"thinking" | "happy" | "scared">("thinking");
+  const [showConfetti, setShowConfetti] = useState(false);
   const [done, setDone] = useState(false);
   const [carPos, setCarPos] = useState(10);
 
@@ -22,9 +27,10 @@ export default function TestDrive({ training, onComplete }: { training: Training
 
   const choose = (c: string) => {
     setPicked(c);
-    if (c !== scene.correct) setMistakes((m) => m + 1);
+    if (c === scene.correct) { sfxCorrect(); setMood("happy"); setShowConfetti(true); }
+    else { sfxWrong(); setMood("scared"); setMistakes((m) => m + 1); }
     setTimeout(() => {
-      setPicked(null);
+      setPicked(null); setMood("thinking"); setShowConfetti(false);
       if (idx + 1 < scenes.length) setIdx(idx + 1);
       else setDone(true);
     }, 2500);
@@ -34,9 +40,9 @@ export default function TestDrive({ training, onComplete }: { training: Training
     const needsRetrain = mistakes >= 3;
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
-        <div className="text-8xl">✅</div>
+        <Confetti active={!needsRetrain} />
+        <CarBuddy mood={needsRetrain ? "scared" : "celebrate"} size={120} />
         <h2 className="text-3xl font-bold text-center">Test Drive Complete!</h2>
-        <div className="text-6xl my-4"><span className="car">🛻</span>✨</div>
         <p className="text-lg text-center max-w-md opacity-80">
           {mistakes === 0 ? "Perfect driving! The AI training paid off!" :
            `${mistakes} mistake${mistakes > 1 ? "s" : ""}. ${needsRetrain ? "The car needs more training!" : "Not bad — but can it drive alone?"}`}
@@ -64,7 +70,9 @@ export default function TestDrive({ training, onComplete }: { training: Training
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">
+      <Confetti active={showConfetti} />
       <h2 className="text-3xl font-bold">🛻 Quest 4: Test Drive!</h2>
+      <CarBuddy mood={mood} size={80} />
       <p className="opacity-70 text-center max-w-md text-sm">
         Your car is on the road! See what the AI thinks, then decide.
       </p>
@@ -113,10 +121,10 @@ export default function TestDrive({ training, onComplete }: { training: Training
         </div>
       ) : (
         <div className="flex gap-4 fade-in">
-          <button className="btn text-2xl" style={{ background: "#ef4444" }} onClick={() => choose("stop")}>
+          <button className="btn text-2xl" style={{ background: "#ef4444" }} onClick={() => { sfxTap(); choose("stop"); }}>
             🛑 STOP
           </button>
-          <button className="btn text-2xl" style={{ background: "var(--success)", color: "#0f172a" }} onClick={() => choose("go")}>
+          <button className="btn text-2xl" style={{ background: "var(--success)", color: "#0f172a" }} onClick={() => { sfxTap(); choose("go"); }}>
             ✅ GO
           </button>
         </div>
