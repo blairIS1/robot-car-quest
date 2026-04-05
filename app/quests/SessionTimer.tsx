@@ -4,7 +4,7 @@ import CarBuddy from "./CarBuddy";
 import { useNarrate } from "./speak";
 import { useMobile } from "./useMobile";
 
-const SESSION_LIMIT = 10 * 60;
+const SESSION_LIMIT = 20 * 60;
 
 export default function SessionTimer({ onDismiss }: { onDismiss: () => void }) {
   const mobile = useMobile();
@@ -14,7 +14,7 @@ export default function SessionTimer({ onDismiss }: { onDismiss: () => void }) {
       <CarBuddy mood="happy" size={mobile ? 90 : 140} talking={talking} />
       <h2 className="text-3xl font-bold text-center">⏰ Great job today!</h2>
       <p className="text-lg opacity-80 text-center max-w-md">
-        You&apos;ve been playing for 10 minutes — your eyes and brain need a break!
+        You&apos;ve been playing for 20 minutes — your eyes and brain need a break!
       </p>
       <p className="text-base opacity-60 text-center">Look out the window at something far away, then come back later! 👀🌳</p>
       <button className="btn btn-primary mt-4" onClick={onDismiss}>
