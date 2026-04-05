@@ -66,7 +66,7 @@ export default function TeachItToSee({ onComplete }: { onComplete: (data: Traini
 
       <div className="text-sm opacity-70">{idx + 1} / {items.length}</div>
       <div className="progress-track w-full max-w-64">
-        <div className="progress-fill" style={{ width: `${(idx / items.length) * 100}%` }} />
+        <div className="progress-fill" style={{ width: `${((idx + 1) / items.length) * 100}%` }} />
       </div>
 
       <div className="text-8xl my-2">{current.emoji}</div>
