@@ -106,7 +106,7 @@ export default function TestDrive({ training, onComplete }: { training: Training
         </div>
       </div>
 
-      <div className="flex items-center gap-2 w-full max-w-48">
+      <div className="flex items-center gap-2 w-full max-w-xs">
         <span className="text-xs opacity-60 w-20">Confidence:</span>
         <div className="progress-track flex-1">
           <div className="progress-fill" style={{ width: `${scene.confidence}%`, background: confColor }} />
