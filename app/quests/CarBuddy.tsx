@@ -1,4 +1,5 @@
 "use client";
+import { getSelectedColor } from "./scores";
 
 // Car buddy — a car with eyes and expressions, like Robi in animal-sorter
 type Mood = "idle" | "happy" | "thinking" | "scared" | "celebrate";
@@ -14,7 +15,7 @@ export default function CarBuddy({ mood = "idle", size = 100, talking = false, c
     : mood === "scared"
     ? "M38 55 Q45 50 52 55"
     : "M38 52 Q45 55 52 52";
-  const bodyColor = mood === "celebrate" ? "#fbbf24" : (color || "#38bdf8");
+  const bodyColor = mood === "celebrate" ? "#fbbf24" : (color || getSelectedColor());
   const bodyAnim = mood === "celebrate" ? "bounce 0.5s ease-in-out infinite" : mood === "happy" ? "wiggle 0.6s ease-in-out" : "none";
 
   return (
