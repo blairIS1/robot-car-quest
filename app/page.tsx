@@ -14,7 +14,7 @@ import { sfxTap, sfxCelebrate } from "./quests/sfx";
 import { speak, stopSpeaking, useNarrate, VOICE } from "./quests/speak";
 import { useMobile } from "./quests/useMobile";
 import { startMusic, stopMusic } from "./quests/music";
-import { recordCompletion, getCompletions } from "./quests/scores";
+import { recordCompletion, getCompletions, CAR_COLORS, getSelectedColor, setSelectedColor } from "./quests/scores";
 import { TrainingData } from "./quests/data";
 
 const PARTS = [
@@ -34,13 +34,14 @@ export default function Home() {
   const [completed, setCompleted] = useState<boolean[]>([false, false, false, false, false]);
   const [training, setTraining] = useState<TrainingData>({});
   const [completions, setCompletions] = useState(0);
+  const [carColor, setCarColor] = useState("#38bdf8");
   const [started, setStarted] = useState(false);
   const { expired, dismiss } = useSessionTimer();
   const mobile = useMobile();
   // Menu narration — only plays after Start is tapped (started=true triggers remount via key)
   const { talking } = useNarrate(started ? [VOICE.welcome, VOICE.menuSubtitle] : []);
 
-  useEffect(() => { setCompletions(getCompletions()); }, []);
+  useEffect(() => { setCompletions(getCompletions()); setCarColor(getSelectedColor()); }, []);
 
   const markDone = (idx: number) => {
     setCompleted((prev) => { const n = [...prev]; n[idx] = true; return n; });
@@ -63,7 +64,7 @@ export default function Home() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={completed.every(Boolean)} />
-        <CarBuddy mood={completed.every(Boolean) ? "celebrate" : "idle"} size={mobile ? 90 : 140} talking={talking} />
+        <CarBuddy mood={completed.every(Boolean) ? "celebrate" : "idle"} size={mobile ? 90 : 140} talking={talking} color={carColor} />
         <ReadableText voice={VOICE.menuTitle} as="h1" className="text-4xl font-bold text-center">
           Build a Robot Car!
         </ReadableText>
@@ -102,7 +103,32 @@ export default function Home() {
               {partsCollected}/5 parts collected
             </ReadableText>
 
-            {completions > 0 && <p className="text-xs opacity-40">🏆 Completed {completions} time{completions > 1 ? "s" : ""}</p>}
+            {completions > 0 && (
+              <div className="flex flex-col items-center gap-2 fade-in">
+                <p className="text-sm opacity-60">🏆 Completed {completions} time{completions > 1 ? "s" : ""} — pick your car color!</p>
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {CAR_COLORS.map((c) => {
+                    const unlocked = completions >= c.unlockAt;
+                    return (
+                      <button key={c.name} title={unlocked ? c.name : `Complete ${c.unlockAt}x to unlock`}
+                        className="rounded-full border-2 transition-transform"
+                        style={{
+                          width: 36, height: 36,
+                          background: c.color === "url(#rainbow)" ? "linear-gradient(90deg,#f87171,#fbbf24,#4ade80,#38bdf8,#a78bfa)" : c.color,
+                          borderColor: carColor === c.color ? "white" : "transparent",
+                          opacity: unlocked ? 1 : 0.3,
+                          cursor: unlocked ? "pointer" : "not-allowed",
+                          transform: carColor === c.color ? "scale(1.2)" : "scale(1)",
+                        }}
+                        onClick={() => { if (unlocked) { sfxTap(); setCarColor(c.color); setSelectedColor(c.color); } }}
+                      >
+                        {!unlocked && <span className="text-xs">🔒</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-col gap-3 w-full max-w-sm fade-in">
               {QUESTS.map((name, i) => (

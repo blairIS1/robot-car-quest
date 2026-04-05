@@ -3,7 +3,7 @@
 // Car buddy — a car with eyes and expressions, like Robi in animal-sorter
 type Mood = "idle" | "happy" | "thinking" | "scared" | "celebrate";
 
-export default function CarBuddy({ mood = "idle", size = 100, talking = false }: { mood?: Mood; size?: number; talking?: boolean }) {
+export default function CarBuddy({ mood = "idle", size = 100, talking = false, color }: { mood?: Mood; size?: number; talking?: boolean; color?: string }) {
   const w = size;
   const h = size * 0.65;
 
@@ -14,11 +14,18 @@ export default function CarBuddy({ mood = "idle", size = 100, talking = false }:
     : mood === "scared"
     ? "M38 55 Q45 50 52 55"
     : "M38 52 Q45 55 52 52";
-  const bodyColor = mood === "celebrate" ? "#fbbf24" : "#38bdf8";
+  const bodyColor = mood === "celebrate" ? "#fbbf24" : (color || "#38bdf8");
   const bodyAnim = mood === "celebrate" ? "bounce 0.5s ease-in-out infinite" : mood === "happy" ? "wiggle 0.6s ease-in-out" : "none";
 
   return (
     <svg width={w} height={h} viewBox="0 0 95 58" fill="none">
+      <defs>
+        <linearGradient id="rainbow" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#f87171" /><stop offset="25%" stopColor="#fbbf24" />
+          <stop offset="50%" stopColor="#4ade80" /><stop offset="75%" stopColor="#38bdf8" />
+          <stop offset="100%" stopColor="#a78bfa" />
+        </linearGradient>
+      </defs>
       <style>{`
         @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
         @keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
