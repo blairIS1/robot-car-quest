@@ -117,7 +117,9 @@ export default function TestDrive({ training, onComplete }: { training: Training
       {picked ? (
         <div className="text-lg text-center fade-in" style={{ color: picked === scene.correct ? "var(--success)" : "var(--warn)" }}>
           {picked === scene.correct
-            ? `✅ Correct! The car should ${scene.correct}!`
+            ? (scene.aiChoice !== scene.correct
+              ? `✅ You're right! The AI said ${scene.aiChoice.toUpperCase()} but the car should ${scene.correct}!`
+              : `✅ Correct! The car should ${scene.correct}!`)
             : `Oops! The car should ${scene.correct}! 😅`}
         </div>
       ) : (
