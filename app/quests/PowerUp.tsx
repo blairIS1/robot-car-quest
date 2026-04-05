@@ -39,7 +39,7 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
       <div className="w-full max-w-64">
         <div className="progress-track">
           <div className="progress-fill" style={{
-            width: `${Math.min((batteries / max) * 100, 100)}%`,
+            width: `${Math.min((batteries / ideal) * 100, 100)}%`,
             background: status === "perfect" ? "var(--success)" : status === "heavy" || status === "overload" ? "var(--warn)" : undefined,
           }} />
         </div>
