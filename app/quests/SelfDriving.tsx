@@ -63,7 +63,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
       return { icon: "😅", text: "False alarm — the AI had it right. No harm done!", ok: true };
     }
     if (!aiWrong) return { icon: "🤖✅", text: `AI got it right! ${event.label} → ${event.aiChoice.toUpperCase()}`, ok: true };
-    return { icon: "😅", text: `Oops! The AI chose ${event.aiChoice.toUpperCase()} but should have ${event.correct.toUpperCase()}ed for "${event.label}"! Still learning!`, ok: false };
+    return { icon: "😅", text: `Oops! The AI chose ${event.aiChoice.toUpperCase()} but should have chosen ${event.correct.toUpperCase()} for "${event.label}"! Still learning!`, ok: false };
   };
 
   const advance = () => {
