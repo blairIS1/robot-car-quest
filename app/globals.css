@@ -35,13 +35,15 @@ body {
   .progress-track { height: 10px; }
 }
 
-/* Scale down text on small screens */
+/* Scale down text on small screens — but keep farsighted-friendly minimums */
 @media (max-width: 480px) {
   h1, .text-4xl { font-size: 1.75rem !important; }
-  h2, .text-3xl { font-size: 1.4rem !important; }
-  .text-2xl { font-size: 1.15rem !important; }
-  .text-xl { font-size: 1.05rem !important; }
-  .text-lg { font-size: 0.95rem !important; }
+  h2, .text-3xl { font-size: 1.5rem !important; }
+  .text-2xl { font-size: 1.4rem !important; }
+  .text-xl { font-size: 1.3rem !important; }
+  .text-lg { font-size: 1.2rem !important; }
+  .text-sm { font-size: 1rem !important; }
+  .text-xs { font-size: 0.95rem !important; }
   .text-8xl { font-size: 4rem !important; }
   .text-5xl { font-size: 2.5rem !important; }
 }
@@ -161,3 +163,13 @@ body {
 .readable-text:active .read-icon {
   opacity: 1;
 }
+
+/* === Farsighted-friendly: minimum font sizes === */
+.text-xs { font-size: 1rem !important; }
+.text-sm { font-size: 1.1rem !important; }
+.text-base { font-size: 1.2rem !important; }
+.text-lg { font-size: 1.3rem !important; }
+.text-xl { font-size: 1.4rem !important; }
+.text-2xl { font-size: 1.6rem !important; }
+.text-3xl { font-size: 2rem !important; }
+.btn { font-size: 1.3rem; }
