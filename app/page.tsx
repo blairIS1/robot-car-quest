@@ -72,7 +72,12 @@ export default function Home() {
         </ReadableText>
 
         {!started ? (
-          <button className="btn btn-primary text-xl mt-4" onClick={() => {
+          <>
+            <div className="rounded-xl p-4 text-center max-w-sm" style={{ background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.3)" }}>
+              <p className="text-lg">📏 Hold your tablet at arm&apos;s length!</p>
+              <p className="opacity-60">Not too close — your eyes will thank you! 👀</p>
+            </div>
+            <button className="btn btn-primary text-xl mt-4" onClick={() => {
             sfxTap();
             setStarted(true);
             startMusic();
@@ -80,6 +85,7 @@ export default function Home() {
           }}>
             ▶️ Start!
           </button>
+          </>
         ) : (
           <>
             <div className="flex gap-3">
