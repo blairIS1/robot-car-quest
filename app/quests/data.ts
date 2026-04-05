@@ -58,16 +58,16 @@ export function generateTestScenes(training: TrainingData) {
 // Generate self-driving events based on training data
 export function generateSelfDrivingEvents(training: TrainingData) {
   const events = [
-    { emoji: "🟢", label: "Green light", correct: "go" as const, category: "lights", aiDelay: 800 },
-    { emoji: "🛑", label: "Stop sign", correct: "stop" as const, category: "signs", aiDelay: 600 },
-    { emoji: "🐕", label: "Dog on the road!", correct: "stop" as const, category: "animals", aiDelay: 2000 },
-    { emoji: "➡️", label: "Open road", correct: "go" as const, category: "obstacles", aiDelay: 500 },
-    { emoji: "🔴", label: "Red light", correct: "stop" as const, category: "lights", aiDelay: 700 },
-    { emoji: "🚶", label: "Kid crossing!", correct: "stop" as const, category: "people", aiDelay: 2200 },
-    { emoji: "🟢", label: "Green light", correct: "go" as const, category: "lights", aiDelay: 600 },
-    { emoji: "🚧", label: "Construction zone", correct: "stop" as const, category: "signs", aiDelay: 900 },
-    { emoji: "🐈", label: "Cat on road!", correct: "stop" as const, category: "animals", aiDelay: 1800 },
-    { emoji: "➡️", label: "Highway clear", correct: "go" as const, category: "obstacles", aiDelay: 400 },
+    { emoji: "🟢", label: "Green light", correct: "go" as const, category: "lights", aiDelay: 3000 },
+    { emoji: "🛑", label: "Stop sign", correct: "stop" as const, category: "signs", aiDelay: 2500 },
+    { emoji: "🐕", label: "Dog on the road!", correct: "stop" as const, category: "animals", aiDelay: 4000 },
+    { emoji: "➡️", label: "Open road", correct: "go" as const, category: "obstacles", aiDelay: 2500 },
+    { emoji: "🔴", label: "Red light", correct: "stop" as const, category: "lights", aiDelay: 2800 },
+    { emoji: "🚶", label: "Kid crossing!", correct: "stop" as const, category: "people", aiDelay: 4500 },
+    { emoji: "🟢", label: "Green light", correct: "go" as const, category: "lights", aiDelay: 2500 },
+    { emoji: "🚧", label: "Construction zone", correct: "stop" as const, category: "signs", aiDelay: 3000 },
+    { emoji: "🐈", label: "Cat on road!", correct: "stop" as const, category: "animals", aiDelay: 3500 },
+    { emoji: "➡️", label: "Highway clear", correct: "go" as const, category: "obstacles", aiDelay: 2000 },
   ];
 
   return events.map((e) => {
