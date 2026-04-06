@@ -8,9 +8,9 @@ export const CAR_COLORS = [
   { name: "Green", color: "#4ade80", unlockAt: 1 },
   { name: "Purple", color: "#a78bfa", unlockAt: 2 },
   { name: "Red", color: "#f87171", unlockAt: 3 },
-  { name: "Gold", color: "#fbbf24", unlockAt: 5 },
-  { name: "Pink", color: "#f472b6", unlockAt: 7 },
-  { name: "Rainbow", color: "url(#rainbow)", unlockAt: 10 },
+  { name: "Gold", color: "#fbbf24", unlockAt: 4 },
+  { name: "Pink", color: "#f472b6", unlockAt: 5 },
+  { name: "Rainbow", color: "url(#rainbow)", unlockAt: 6 },
 ];
 
 export function recordCompletion(): number {

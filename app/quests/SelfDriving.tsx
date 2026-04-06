@@ -7,13 +7,14 @@ import { sfxCorrect, sfxWrong, sfxTap, sfxBrake, sfxCelebrate } from "./sfx";
 import { stopSpeaking, useNarrate, VOICE } from "./speak";
 import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
+import { CAR_START_POS, DRIVING_PHASE_MS, TIMER_TICK_MS, URGENCY_DANGER_PCT, CONFIDENCE_HIGH_THRESHOLD, CONFIDENCE_MED_THRESHOLD } from "./constants";
 
 export default function SelfDriving({ training, onComplete }: { training: TrainingData; onComplete: () => void }) {
   const [events] = useState(() => generateSelfDrivingEvents(training));
   const mobile = useMobile();
   const { talking, narrate } = useNarrate([VOICE.q5Start]);
   const [idx, setIdx] = useState(0);
-  const [carPos, setCarPos] = useState(10);
+  const [carPos, setCarPos] = useState(CAR_START_POS);
   const [phase, setPhase] = useState<"driving" | "event" | "result">("driving");
   const [overridden, setOverridden] = useState(false);
   const [aiActed, setAiActed] = useState(false);
@@ -28,13 +29,13 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
   useEffect(() => {
     if (phase !== "driving" || talking) return;
     const t = setInterval(() => setCarPos((p) => Math.min(p + 1, 70)), 60);
-    const show = setTimeout(() => { setPhase("event"); setTimer(0); }, 1500);
+    const show = setTimeout(() => { setPhase("event"); setTimer(0); }, DRIVING_PHASE_MS);
     return () => { clearInterval(t); clearTimeout(show); };
   }, [phase, talking]);
 
   useEffect(() => {
     if (phase !== "event") return;
-    const t = setInterval(() => setTimer((v) => v + 100), 100);
+    const t = setInterval(() => setTimer((v) => v + TIMER_TICK_MS), TIMER_TICK_MS);
     return () => clearInterval(t);
   }, [phase]);
 
@@ -69,7 +70,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
   const advance = () => {
     if (idx + 1 >= events.length) { setDone(true); return; }
     setIdx(idx + 1);
-    setCarPos(10);
+    setCarPos(CAR_START_POS);
     setPhase("driving");
     setOverridden(false);
     setAiActed(false);
@@ -100,7 +101,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
 
   const result = phase === "result" ? getResult() : null;
   const urgencyPct = aiWrong ? Math.min((timer / event.aiDelay) * 100, 100) : 0;
-  const confColor = event.confidence >= 70 ? "#4ade80" : event.confidence >= 45 ? "#fbbf24" : "#ef4444";
+  const confColor = event.confidence >= CONFIDENCE_HIGH_THRESHOLD ? "#4ade80" : event.confidence >= CONFIDENCE_MED_THRESHOLD ? "#fbbf24" : "#ef4444";
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4 p-8 fade-in">
@@ -141,7 +142,7 @@ export default function SelfDriving({ training, onComplete }: { training: Traini
         <div className="w-full max-w-lg">
           <div className="text-sm text-center mb-1" style={{ color: "var(--warn)" }}>⚠️ Override before the AI acts!</div>
           <div className="progress-track">
-            <div className="progress-fill" style={{ width: `${urgencyPct}%`, background: urgencyPct > 70 ? "#ef4444" : "var(--warn)", transition: "width 0.1s linear" }} />
+            <div className="progress-fill" style={{ width: `${urgencyPct}%`, background: urgencyPct > URGENCY_DANGER_PCT ? "#ef4444" : "var(--warn)", transition: "width 0.1s linear" }} />
           </div>
         </div>
       )}

@@ -6,37 +6,38 @@ import { sfxEngine, sfxBrake, sfxTap, sfxCelebrate } from "./sfx";
 import { stopSpeaking, useNarrate, VOICE } from "./speak";
 import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
+import { INITIAL_BATTERY, BATTERY_DRAIN_RATE, BATTERY_REGEN_RATE, BATTERY_TICK_MS, FAST_SPEED_THRESHOLD, REGEN_BATTERY_THRESHOLD, MAX_SPEED, CAR_POSITION_MULTIPLIER, MAX_CAR_POSITION_PCT } from "./constants";
 
 export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
   const [speed, setSpeed] = useState(0);
   const mobile = useMobile();
   const { talking, narrate } = useNarrate([VOICE.q2Start]);
-  const [battery, setBattery] = useState(80);
+  const [battery, setBattery] = useState(INITIAL_BATTERY);
   const [braking, setBraking] = useState(false);
   const [learned, setLearned] = useState({ drove: false, regen: false });
 
   useEffect(() => {
     const t = setInterval(() => {
       setBattery((b) => {
-        if (speed > 0 && !braking) return Math.max(b - speed * 0.3, 0);
-        if (braking && speed > 0) return Math.min(b + 2, 100);
+        if (speed > 0 && !braking) return Math.max(b - speed * BATTERY_DRAIN_RATE, 0);
+        if (braking && speed > 0) return Math.min(b + BATTERY_REGEN_RATE, 100);
         return b;
       });
-    }, 200);
+    }, BATTERY_TICK_MS);
     return () => clearInterval(t);
   }, [speed, braking]);
 
   useEffect(() => {
-    if (speed >= 3 && !learned.drove) { setLearned((l) => ({ ...l, drove: true })); sfxEngine(); narrate(VOICE.q2Fast); }
+    if (speed >= FAST_SPEED_THRESHOLD && !learned.drove) { setLearned((l) => ({ ...l, drove: true })); sfxEngine(); narrate(VOICE.q2Fast); }
   }, [speed, learned.drove, narrate]);
 
   useEffect(() => {
-    if (braking && battery > 82 && !learned.regen) { setLearned((l) => ({ ...l, regen: true })); sfxCelebrate(); narrate(VOICE.q2Regen); }
+    if (braking && battery > REGEN_BATTERY_THRESHOLD && !learned.regen) { setLearned((l) => ({ ...l, regen: true })); sfxCelebrate(); narrate(VOICE.q2Regen); }
   }, [braking, battery, learned.regen, narrate]);
 
   const done = learned.drove && learned.regen;
-  const carX = speed * 8;
-  const mood = braking ? "thinking" as const : speed >= 3 ? "happy" as const : done ? "celebrate" as const : "idle" as const;
+  const carX = speed * CAR_POSITION_MULTIPLIER;
+  const mood = braking ? "thinking" as const : speed >= FAST_SPEED_THRESHOLD ? "happy" as const : done ? "celebrate" as const : "idle" as const;
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
@@ -50,7 +51,7 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
 
       <div className="w-full max-w-lg h-20 sm:h-24 bg-gray-800 rounded-2xl relative overflow-hidden flex items-end">
         <div className="absolute bottom-0 w-full h-1 bg-gray-600" />
-        <div className="text-5xl absolute bottom-2 transition-all duration-200 car" style={{ left: `${Math.min(carX, 85)}%` }}>🛻</div>
+        <div className="text-5xl absolute bottom-2 transition-all duration-200 car" style={{ left: `${Math.min(carX, MAX_CAR_POSITION_PCT)}%` }}>🛻</div>
       </div>
 
       <div className="w-full max-w-64">
@@ -66,10 +67,9 @@ export default function MakeItMove({ onComplete }: { onComplete: () => void }) {
 
       <div className="flex flex-col items-center gap-3">
         <label className="text-sm opacity-70">Speed: {speed}</label>
-        <input type="range" min={0} max={5} value={speed} disabled={talking} onChange={(e) => { setSpeed(Number(e.target.value)); if (Number(e.target.value) > 0) sfxEngine(); }} className="w-full max-w-64" />
+        <input type="range" min={0} max={MAX_SPEED} value={speed} onChange={(e) => { setSpeed(Number(e.target.value)); if (Number(e.target.value) > 0) sfxEngine(); }} className="w-full max-w-64" />
         <button
           className={`btn text-xl ${braking ? "btn-success" : "btn-primary"}`}
-          disabled={talking}
           onPointerDown={() => { setBraking(true); sfxBrake(); }}
           onPointerUp={() => setBraking(false)}
           onPointerLeave={() => setBraking(false)}

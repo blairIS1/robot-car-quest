@@ -7,6 +7,7 @@ import { sfxCorrect, sfxWrong, sfxTap } from "./sfx";
 import { stopSpeaking, useNarrate, VOICE } from "./speak";
 import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
+import { RETRAIN_MISTAKE_THRESHOLD, ANSWER_DELAY_MS, CAR_START_POS, CONFIDENCE_HIGH_THRESHOLD, CONFIDENCE_MED_THRESHOLD } from "./constants";
 
 export default function TestDrive({ training, onComplete }: { training: TrainingData; onComplete: (needsRetrain: boolean) => void }) {
   const [scenes] = useState(() => generateTestScenes(training));
@@ -18,14 +19,14 @@ export default function TestDrive({ training, onComplete }: { training: Training
   const [mood, setMood] = useState<"thinking" | "happy" | "scared">("thinking");
   const [showConfetti, setShowConfetti] = useState(false);
   const [done, setDone] = useState(false);
-  const [carPos, setCarPos] = useState(10);
+  const [carPos, setCarPos] = useState(CAR_START_POS);
 
   const scene = scenes[idx];
 
   useEffect(() => {
     if (picked === scene?.correct) {
       const t = setInterval(() => setCarPos((p) => Math.min(p + 2, 90)), 50);
-      const stop = setTimeout(() => { clearInterval(t); setCarPos(10); }, 1200);
+      const stop = setTimeout(() => { clearInterval(t); setCarPos(CAR_START_POS); }, 1200);
       return () => { clearInterval(t); clearTimeout(stop); };
     }
   }, [picked, scene]);
@@ -38,11 +39,11 @@ export default function TestDrive({ training, onComplete }: { training: Training
       setPicked(null); setMood("thinking"); setShowConfetti(false);
       if (idx + 1 < scenes.length) setIdx(idx + 1);
       else setDone(true);
-    }, 2500);
+    }, ANSWER_DELAY_MS);
   };
 
   if (done) {
-    const needsRetrain = mistakes >= 3;
+    const needsRetrain = mistakes >= RETRAIN_MISTAKE_THRESHOLD;
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-6 p-8 fade-in">
         <Confetti active={!needsRetrain} />
@@ -70,7 +71,7 @@ export default function TestDrive({ training, onComplete }: { training: Training
     );
   }
 
-  const confColor = scene.confidence >= 70 ? "#4ade80" : scene.confidence >= 45 ? "#fbbf24" : "#ef4444";
+  const confColor = scene.confidence >= CONFIDENCE_HIGH_THRESHOLD ? "#4ade80" : scene.confidence >= CONFIDENCE_MED_THRESHOLD ? "#fbbf24" : "#ef4444";
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-5 p-8 fade-in">

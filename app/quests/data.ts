@@ -1,4 +1,5 @@
 "use client";
+import { CONFIDENCE_NONE, CONFIDENCE_LOW, CONFIDENCE_HIGH } from "./constants";
 
 // Training categories for the car's AI brain
 export const CATEGORIES = ["lights", "signs", "people", "animals", "obstacles"] as const;
@@ -9,7 +10,7 @@ export type TrainingData = Record<string, number>;
 // Confidence: 0 correct → 25%, 1 → 55%, 2+ → 90%
 export function getConfidence(training: TrainingData, cat: string): number {
   const count = training[cat] || 0;
-  return count === 0 ? 25 : count === 1 ? 55 : 90;
+  return count === 0 ? CONFIDENCE_NONE : count === 1 ? CONFIDENCE_LOW : CONFIDENCE_HIGH;
 }
 
 // Training items — each has a category for tracking

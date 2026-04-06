@@ -6,18 +6,17 @@ import { sfxTap, sfxCorrect, sfxWrong } from "./sfx";
 import { stopSpeaking, useNarrate, VOICE } from "./speak";
 import { useMobile } from "./useMobile";
 import Confetti from "./Confetti";
+import { IDEAL_BATTERIES, MAX_BATTERIES } from "./constants";
 
 export default function PowerUp({ onComplete }: { onComplete: () => void }) {
   const [batteries, setBatteries] = useState(0);
   const mobile = useMobile();
   const { talking, narrate } = useNarrate([VOICE.q1Start]);
-  const ideal = 4;
-  const max = 7;
-  const status = batteries === 0 ? "empty" : batteries < ideal ? "low" : batteries === ideal ? "perfect" : batteries <= max ? "heavy" : "overload";
+  const status = batteries === 0 ? "empty" : batteries < IDEAL_BATTERIES ? "low" : batteries === IDEAL_BATTERIES ? "perfect" : batteries <= MAX_BATTERIES ? "heavy" : "overload";
 
   const msg: Record<string, string> = {
     empty: "Tap the batteries to add them to your car! 🔋",
-    low: `${batteries}/${ideal} — Need more power! The car won't go far enough.`,
+    low: `${batteries}/${IDEAL_BATTERIES} — Need more power! The car won't go far enough.`,
     perfect: "✅ Perfect! Just the right amount of batteries!",
     heavy: `⚠️ ${batteries} batteries — the car is getting too heavy...`,
     overload: "💥 Too many! The car can't even move!",
@@ -39,11 +38,11 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
       <div className="w-full max-w-64">
         <div className="progress-track">
           <div className="progress-fill" style={{
-            width: `${Math.min((batteries / ideal) * 100, 100)}%`,
+            width: `${Math.min((batteries / IDEAL_BATTERIES) * 100, 100)}%`,
             background: status === "perfect" ? "var(--success)" : status === "heavy" || status === "overload" ? "var(--warn)" : undefined,
           }} />
         </div>
-        <div className="text-center mt-2 text-sm opacity-70">{batteries} / {ideal} batteries</div>
+        <div className="text-center mt-2 text-sm opacity-70">{batteries} / {IDEAL_BATTERIES} batteries</div>
       </div>
 
       <div className="text-lg text-center font-semibold min-h-[2em]">{msg[status]}</div>
@@ -51,10 +50,10 @@ export default function PowerUp({ onComplete }: { onComplete: () => void }) {
       <div className="flex gap-3">
         <button className="btn btn-primary text-3xl" disabled={talking} onClick={() => {
           sfxTap();
-          const n = Math.min(batteries + 1, max + 1);
+          const n = Math.min(batteries + 1, MAX_BATTERIES + 1);
           setBatteries(n);
-          if (n === ideal) { sfxCorrect(); narrate(VOICE.q1Perfect); }
-          else if (n > max) { sfxWrong(); narrate(VOICE.q1TooMany); }
+          if (n === IDEAL_BATTERIES) { sfxCorrect(); narrate(VOICE.q1Perfect); }
+          else if (n > MAX_BATTERIES) { sfxWrong(); narrate(VOICE.q1TooMany); }
         }}>🔋 +1</button>
         <button className="btn text-3xl" disabled={talking} style={{ background: "#475569" }} onClick={() => { sfxTap(); setBatteries(Math.max(batteries - 1, 0)); }}>➖</button>
       </div>
